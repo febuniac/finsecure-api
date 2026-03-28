@@ -528,19 +528,8 @@ async function loadIssues() {
   }
 }
 
-async function sendToDevin(issueNumber, title, body) {
+function sendToDevin(issueNumber, title, body) {
   const btn = document.getElementById(`btn-${issueNumber}`);
-
-  if (!config.apiKey || !config.orgId) {
-    showToast('configure your devin api key first', 'error');
-    openConfig();
-    return;
-  }
-
-  btn.textContent = 'devin working...';
-  btn.className = 'btn-devin running';
-  btn.disabled = true;
-  localStorage.setItem(`devin_session_${issueNumber}`, 'running');
 
   const prompt = `You are fixing a bug in the FinSecure API repository (https://github.com/${config.repo}).
 
@@ -557,39 +546,20 @@ Please:
 
 Stay focused on this specific issue only.`;
 
-  try {
-    const res = await fetch(`https://api.devin.ai/v3/organizations/${config.orgId}/sessions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${config.apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ prompt })
-    });
+  btn.textContent = 'opening devin...';
+  btn.className = 'btn-devin running';
 
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(`Devin API ${res.status}: ${err}`);
-    }
-
-    const data = await res.json();
-    const sessionUrl = data.url || `https://app.devin.ai/sessions/${data.session_id || data.id}`;
-
-    btn.textContent = 'session started ✓';
+  setTimeout(() => {
+    btn.textContent = 'sent to devin ✓';
     btn.className = 'btn-devin done';
+    btn.disabled = true;
     localStorage.setItem(`devin_session_${issueNumber}`, 'done');
-
     devinCount++;
     document.getElementById('s-devin').textContent = devinCount;
+  }, 800);
 
-    showToast(`devin is on it → <a href="${sessionUrl}" target="_blank" style="color:var(--blue)">view session</a>`, 'success');
-  } catch(err) {
-    btn.textContent = 'fix with devin';
-    btn.className = 'btn-devin';
-    btn.disabled = false;
-    localStorage.removeItem(`devin_session_${issueNumber}`);
-    showToast('error: ' + err.message, 'error');
-  }
+  showToast(`launching devin for issue #${issueNumber}...`, 'info');
+  setTimeout(() => window.open(`https://app.devin.ai/?prompt=${encodeURIComponent(prompt)}`, '_blank'), 300);
 }
 
 function showToast(msg, type = 'info') {

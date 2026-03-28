@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinSecure — Backlog Resolver</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0f11;
+    --surface: #16181c;
+    --surface2: #1e2026;
+    --border: #2a2d35;
+    --border2: #3a3e48;
+    --text: #e8eaf0;
+    --muted: #7a7f8e;
+    --hint: #4a4f5e;
+    --blue: #4a9eff;
+    --blue-bg: #0d1f35;
+    --blue-border: #1a3a5c;
+    --amber: #f0a030;
+    --amber-bg: #2a1a08;
+    --amber-border: #4a3010;
+    --red: #ff5a5a;
+    --red-bg: #2a0d0d;
+    --red-border: #4a1a1a;
+    --green: #3dcc7e;
+    --green-bg: #0d2a1a;
+    --green-border: #1a4a2a;
+    --purple: #a78bfa;
+    --purple-bg: #1a1030;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .logo {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .logo-mark {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--blue);
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .logo-sub { font-size: 11px; color: var(--muted); }
+  .nav-label { font-size: 10px; color: var(--hint); letter-spacing: 0.1em; text-transform: uppercase; padding: 0 20px; margin-bottom: 6px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 20px; font-size: 13px; color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .nav-item:hover { color: var(--text); background: var(--surface2); }
+  .nav-item.active { color: var(--text); border-left-color: var(--blue); background: var(--surface2); }
+  .nav-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .nav-count {
+    margin-left: auto; font-family: var(--font-mono); font-size: 11px;
+    background: var(--surface2); color: var(--muted);
+    padding: 1px 7px; border-radius: 10px;
+  }
+  .sidebar-footer {
+    margin-top: auto; padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--hint);
+    font-family: var(--font-mono);
+  }
+  .repo-link { color: var(--blue); text-decoration: none; }
+  .repo-link:hover { text-decoration: underline; }
+
+  /* Main */
+  .main { padding: 32px 36px; overflow-y: auto; }
+
+  .topbar {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; margin-bottom: 28px; gap: 16px;
+  }
+  .page-title { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .page-sub { font-size: 13px; color: var(--muted); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 16px; border-radius: 6px; font-size: 13px;
+    font-family: var(--font-sans); cursor: pointer; transition: all 0.15s;
+    font-weight: 400; border: none;
+  }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { background: #6ab0ff; }
+  .btn-ghost {
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--border2);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--border2); background: var(--surface2); }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .stat-val { font-size: 26px; font-family: var(--font-mono); font-weight: 500; }
+  .stat-val.blue { color: var(--blue); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.red { color: var(--red); }
+  .stat-val.green { color: var(--green); }
+
+  /* Filters */
+  .filters { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+  .filter-pill {
+    padding: 5px 14px; border-radius: 20px; font-size: 12px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer; transition: all 0.15s;
+    font-family: var(--font-sans);
+  }
+  .filter-pill:hover { border-color: var(--border2); color: var(--text); }
+  .filter-pill.active { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
+  .filter-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+
+  /* Issues list */
+  .issues-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .issue-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px 18px;
+    transition: border-color 0.15s;
+    animation: fadeIn 0.3s ease forwards;
+    opacity: 0;
+  }
+  .issue-card:hover { border-color: var(--border2); }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  .issue-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+  .issue-num { font-family: var(--font-mono); font-size: 11px; color: var(--hint); white-space: nowrap; margin-top: 2px; }
+  .issue-title { font-size: 14px; font-weight: 500; flex: 1; line-height: 1.4; }
+  .issue-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  .issue-body { font-size: 12px; color: var(--muted); margin-bottom: 10px; line-height: 1.6; padding-left: 36px; }
+
+  .issue-footer { display: flex; align-items: center; gap: 8px; padding-left: 36px; flex-wrap: wrap; }
+  .badge {
+    font-size: 10px; padding: 2px 8px; border-radius: 4px;
+    font-family: var(--font-mono); font-weight: 500;
+    white-space: nowrap;
+  }
+  .badge-bug { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+  .badge-security { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+  .badge-codeql { background: var(--purple-bg); color: var(--purple); border: 1px solid #3a2860; }
+  .badge-perf { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+  .badge-default { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  .issue-age { font-size: 11px; color: var(--hint); margin-left: auto; font-family: var(--font-mono); }
+
+  /* Devin button states */
+  .btn-devin {
+    font-size: 11px; padding: 5px 12px; border-radius: 5px;
+    border: 1px solid var(--blue-border); background: var(--blue-bg);
+    color: var(--blue); cursor: pointer; font-family: var(--font-mono);
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .btn-devin:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .btn-devin:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-devin.running {
+    border-color: var(--amber-border); background: var(--amber-bg);
+    color: var(--amber); animation: pulse 1.5s infinite;
+  }
+  .btn-devin.done {
+    border-color: var(--green-border); background: var(--green-bg);
+    color: var(--green);
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+  /* Loading / empty */
+  .loading {
+    text-align: center; padding: 60px 20px;
+    color: var(--muted); font-family: var(--font-mono); font-size: 13px;
+  }
+  .spinner {
+    width: 24px; height: 24px; border: 2px solid var(--border2);
+    border-top-color: var(--blue); border-radius: 50%;
+    animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 28px; width: 480px; max-width: 90vw;
+  }
+  .modal h3 { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+  .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+  .config-row { margin-bottom: 14px; }
+  .config-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .config-input {
+    width: 100%; padding: 8px 12px; background: var(--surface2);
+    border: 1px solid var(--border2); border-radius: 6px;
+    color: var(--text); font-family: var(--font-mono); font-size: 12px;
+    outline: none;
+  }
+  .config-input:focus { border-color: var(--blue); }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 12px 16px;
+    font-size: 12px; color: var(--text); font-family: var(--font-mono);
+    z-index: 200; transform: translateY(80px); opacity: 0;
+    transition: all 0.3s; max-width: 360px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-left: 3px solid var(--green); }
+  .toast.error { border-left: 3px solid var(--red); }
+  .toast.info { border-left: 3px solid var(--blue); }
+
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-mark">FINSECURE</span>
+      <span class="logo-sub">backlog resolver</span>
+    </div>
+    <div style="margin-bottom: 16px;">
+      <div class="nav-label">views</div>
+      <div class="nav-item active" onclick="setView('all')">
+        <span class="nav-dot" style="background:#7a7f8e"></span>
+        all items
+        <span class="nav-count" id="cnt-all">—</span>
+      </div>
+      <div class="nav-item" onclick="setView('bug')">
+        <span class="nav-dot" style="background:var(--amber)"></span>
+        bugs
+        <span class="nav-count" id="cnt-bug">—</span>
+      </div>
+      <div class="nav-item" onclick="setView('security')">
+        <span class="nav-dot" style="background:var(--red)"></span>
+        security
+        <span class="nav-count" id="cnt-sec">—</span>
+      </div>
+    </div>
+    <div>
+      <div class="nav-label">devin</div>
+      <div class="nav-item" onclick="openConfig()">
+        <span class="nav-dot" style="background:var(--blue)"></span>
+        configure api
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div style="margin-bottom:4px;">repo</div>
+      <a class="repo-link" href="https://github.com/febuniac/finsecure-api" target="_blank">
+        febuniac/finsecure-api
+      </a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="page-title">open backlog</div>
+        <div class="page-sub" id="scan-time">fetching issues from GitHub...</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="loadIssues()">↻ refresh</button>
+        <button class="btn btn-primary btn-sm" onclick="openConfig()">
+          ⚡ configure devin
+        </button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">total open</div>
+        <div class="stat-val blue" id="s-total">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">bugs</div>
+        <div class="stat-val amber" id="s-bugs">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">security</div>
+        <div class="stat-val red" id="s-sec">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">sent to devin</div>
+        <div class="stat-val green" id="s-devin">0</div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <button class="filter-pill active" onclick="filterIssues('all',this)">all</button>
+      <button class="filter-pill" onclick="filterIssues('bug',this)">bugs</button>
+      <button class="filter-pill" onclick="filterIssues('security',this)">security</button>
+      <button class="filter-pill" onclick="filterIssues('codeql',this)">codeql</button>
+      <div class="filter-sep"></div>
+      <button class="filter-pill" onclick="filterIssues('priority:critical',this)">critical</button>
+      <button class="filter-pill" onclick="filterIssues('priority:high',this)">high</button>
+    </div>
+
+    <div class="issues-list" id="issues-list">
+      <div class="loading">
+        <div class="spinner"></div>
+        loading issues...
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Config modal -->
+<div class="modal-overlay" id="config-modal">
+  <div class="modal">
+    <h3>configure devin api</h3>
+    <div class="modal-sub">credentials are stored locally in your browser only.</div>
+    <div class="config-row">
+      <div class="config-label">devin api key</div>
+      <input class="config-input" type="password" id="cfg-key" placeholder="cog_xxxxxxxxxxxx">
+    </div>
+    <div class="config-row">
+      <div class="config-label">organization id</div>
+      <input class="config-input" type="text" id="cfg-org" placeholder="your_org_id">
+    </div>
+    <div class="config-row">
+      <div class="config-label">github repo (owner/repo)</div>
+      <input class="config-input" type="text" id="cfg-repo" value="febuniac/finsecure-api">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeConfig()">cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveConfig()">save & connect</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const REPO = 'febuniac/finsecure-api';
+let allIssues = [];
+let currentFilter = 'all';
+let currentView = 'all';
+let devinCount = 0;
+let config = {
+  apiKey: localStorage.getItem('devin_api_key') || '',
+  orgId: localStorage.getItem('devin_org_id') || '',
+  repo: localStorage.getItem('devin_repo') || REPO
+};
+
+function getBadgeClass(label) {
+  const l = label.toLowerCase();
+  if (l === 'security' || l === 'codeql') return 'badge-codeql';
+  if (l === 'bug') return 'badge-bug';
+  if (l.includes('security')) return 'badge-security';
+  if (l.includes('priority')) return 'badge-default';
+  if (l.includes('perf')) return 'badge-perf';
+  return 'badge-default';
+}
+
+function isSecurity(issue) {
+  return issue.labels.some(l =>
+    ['security','codeql'].includes(l.name.toLowerCase())
+  );
+}
+
+function isBug(issue) {
+  return issue.labels.some(l => l.name.toLowerCase() === 'bug');
+}
+
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr);
+  const d = Math.floor(diff / 86400000);
+  if (d === 0) return 'today';
+  if (d === 1) return '1 day ago';
+  if (d < 30) return `${d} days ago`;
+  const m = Math.floor(d / 30);
+  return `${m} month${m > 1 ? 's' : ''} ago`;
+}
+
+function renderIssue(issue, delay) {
+  const sec = isSecurity(issue);
+  const bug = isBug(issue);
+  const sessionId = `devin_session_${issue.number}`;
+  const stored = localStorage.getItem(sessionId);
+
+  let btnState = 'idle';
+  let btnText = 'fix with devin';
+  let btnClass = 'btn-devin';
+  if (stored === 'running') { btnState = 'running'; btnText = 'devin working...'; btnClass = 'btn-devin running'; }
+  if (stored === 'done') { btnState = 'done'; btnText = 'session started ✓'; btnClass = 'btn-devin done'; }
+
+  const labelsHtml = issue.labels.map(l =>
+    `<span class="badge ${getBadgeClass(l.name)}">${l.name}</span>`
+  ).join('');
+
+  const shortBody = issue.body
+    ? issue.body.replace(/##\s*/g,'').replace(/```[\s\S]*?```/g,'[code]').substring(0, 140).trim() + '...'
+    : '';
+
+  return `
+    <div class="issue-card" data-number="${issue.number}"
+         data-labels="${issue.labels.map(l=>l.name).join(',').toLowerCase()}"
+         style="animation-delay:${delay}ms">
+      <div class="issue-top">
+        <span class="issue-num">#${issue.number}</span>
+        <span class="issue-title">${issue.title}</span>
+        <div class="issue-actions">
+          <a href="${issue.html_url}" target="_blank"
+             style="font-size:11px;color:var(--muted);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:5px;font-family:var(--font-mono);">
+            view
+          </a>
+          <button class="${btnClass}" id="btn-${issue.number}"
+            onclick="sendToDevin(${issue.number}, \`${issue.title.replace(/`/g,"'")}\`, \`${shortBody.replace(/`/g,"'")}\`)"
+            ${btnState === 'done' ? 'disabled' : ''}>
+            ${btnText}
+          </button>
+        </div>
+      </div>
+      ${shortBody ? `<div class="issue-body">${shortBody}</div>` : ''}
+      <div class="issue-footer">
+        ${labelsHtml}
+        <span class="issue-age">${timeAgo(issue.created_at)}</span>
+      </div>
+    </div>
+  `;
+}
+
+function applyFilter() {
+  const cards = document.querySelectorAll('.issue-card');
+  cards.forEach(card => {
+    const labels = card.dataset.labels || '';
+    const num = parseInt(card.dataset.number);
+    const issue = allIssues.find(i => i.number === num);
+    if (!issue) return;
+
+    let show = true;
+    if (currentFilter === 'bug') show = isBug(issue);
+    else if (currentFilter === 'security') show = isSecurity(issue);
+    else if (currentFilter !== 'all') show = labels.includes(currentFilter);
+
+    if (currentView === 'bug') show = show && isBug(issue);
+    if (currentView === 'security') show = show && isSecurity(issue);
+
+    card.style.display = show ? '' : 'none';
+  });
+}
+
+function filterIssues(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilter();
+}
+
+function setView(view) {
+  currentView = view;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  applyFilter();
+}
+
+async function loadIssues() {
+  const list = document.getElementById('issues-list');
+  list.innerHTML = '<div class="loading"><div class="spinner"></div>fetching from github...</div>';
+
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/issues?state=open&per_page=30`);
+    if (!res.ok) throw new Error('GitHub API error: ' + res.status);
+    allIssues = await res.json();
+
+    const bugs = allIssues.filter(isBug).length;
+    const sec = allIssues.filter(isSecurity).length;
+
+    document.getElementById('s-total').textContent = allIssues.length;
+    document.getElementById('s-bugs').textContent = bugs;
+    document.getElementById('s-sec').textContent = sec;
+    document.getElementById('cnt-all').textContent = allIssues.length;
+    document.getElementById('cnt-bug').textContent = bugs;
+    document.getElementById('cnt-sec').textContent = sec;
+    document.getElementById('scan-time').textContent =
+      `${allIssues.length} open issues · synced just now`;
+
+    if (allIssues.length === 0) {
+      list.innerHTML = '<div class="empty">no open issues found in this repo.</div>';
+      return;
+    }
+
+    list.innerHTML = allIssues.map((issue, i) => renderIssue(issue, i * 60)).join('');
+    applyFilter();
+  } catch(err) {
+    list.innerHTML = `<div class="loading" style="color:var(--red)">failed to load issues.<br><small>${err.message}</small></div>`;
+  }
+}
+
+async function sendToDevin(issueNumber, title, body) {
+  const btn = document.getElementById(`btn-${issueNumber}`);
+
+  if (!config.apiKey || !config.orgId) {
+    showToast('configure your devin api key first', 'error');
+    openConfig();
+    return;
+  }
+
+  btn.textContent = 'devin working...';
+  btn.className = 'btn-devin running';
+  btn.disabled = true;
+  localStorage.setItem(`devin_session_${issueNumber}`, 'running');
+
+  const prompt = `You are fixing a bug in the FinSecure API repository (https://github.com/${config.repo}).
+
+Issue #${issueNumber}: ${title}
+
+Context: ${body}
+
+Please:
+1. Clone the repository and read the relevant source files
+2. Understand the root cause of the issue
+3. Implement a minimal, correct fix
+4. Make sure existing tests still pass
+5. Open a pull request with a clear description of what you changed and why
+
+Stay focused on this specific issue only.`;
+
+  try {
+    const res = await fetch(`https://api.devin.ai/v3/organizations/${config.orgId}/sessions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${config.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ prompt })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Devin API ${res.status}: ${err}`);
+    }
+
+    const data = await res.json();
+    const sessionUrl = data.url || `https://app.devin.ai/sessions/${data.session_id || data.id}`;
+
+    btn.textContent = 'session started ✓';
+    btn.className = 'btn-devin done';
+    localStorage.setItem(`devin_session_${issueNumber}`, 'done');
+
+    devinCount++;
+    document.getElementById('s-devin').textContent = devinCount;
+
+    showToast(`devin is on it → <a href="${sessionUrl}" target="_blank" style="color:var(--blue)">view session</a>`, 'success');
+  } catch(err) {
+    btn.textContent = 'fix with devin';
+    btn.className = 'btn-devin';
+    btn.disabled = false;
+    localStorage.removeItem(`devin_session_${issueNumber}`);
+    showToast('error: ' + err.message, 'error');
+  }
+}
+
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+function openConfig() {
+  document.getElementById('cfg-key').value = config.apiKey;
+  document.getElementById('cfg-org').value = config.orgId;
+  document.getElementById('cfg-repo').value = config.repo;
+  document.getElementById('config-modal').classList.add('open');
+}
+function closeConfig() {
+  document.getElementById('config-modal').classList.remove('open');
+}
+function saveConfig() {
+  config.apiKey = document.getElementById('cfg-key').value.trim();
+  config.orgId = document.getElementById('cfg-org').value.trim();
+  config.repo = document.getElementById('cfg-repo').value.trim();
+  localStorage.setItem('devin_api_key', config.apiKey);
+  localStorage.setItem('devin_org_id', config.orgId);
+  localStorage.setItem('devin_repo', config.repo);
+  closeConfig();
+  showToast('config saved', 'success');
+}
+
+document.getElementById('config-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeConfig();
+});
+
+loadIssues();
+</script>
+</body>
+</html>

@@ -499,7 +499,7 @@ async function loadIssues() {
 
   try {
     const res = await fetch(`https://api.github.com/repos/${REPO}/issues?state=open&per_page=30`, {
-      headers: { 'Authorization': 'token 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' }
+
     });
     if (!res.ok) throw new Error('GitHub API error: ' + res.status);
     allIssues = await res.json();

@@ -40,7 +40,7 @@ def get_payment_history(user_id: str, limit: int = 10) -> list:
     # BUG: limit parameter is never applied — always returns all records
     # Simulated DB call
     all_records = [{"id": i, "user_id": user_id, "amount": i * 10.0} for i in range(100)]
-    return all_records  # should be all_records[:limit]
+    return all_records[:limit]
 
 
 # SQL Injection vulnerability — user input concatenated directly into query string

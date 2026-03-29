@@ -21,6 +21,8 @@
   }
   body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 14px; line-height: 1.6; min-height: 100vh; }
   .layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+
+  /* Sidebar */
   .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 24px 0; display: flex; flex-direction: column; }
   .logo { padding: 0 20px 24px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
   .logo-mark { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--blue); letter-spacing: 0.05em; display: block; margin-bottom: 2px; }
@@ -33,11 +35,14 @@
   .nav-count { margin-left: auto; font-family: var(--font-mono); font-size: 11px; background: var(--surface2); color: var(--muted); padding: 1px 7px; border-radius: 10px; }
   .sidebar-footer { margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--hint); font-family: var(--font-mono); }
   .repo-link { color: var(--blue); text-decoration: none; }
-  .main { padding: 32px 36px; }
+
+  /* Main */
+  .main { padding: 32px 36px; overflow-y: auto; }
   .topbar { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; gap: 16px; flex-wrap: wrap; }
   .page-title { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
   .page-sub { font-size: 13px; color: var(--muted); }
-  .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
   .btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-family: var(--font-sans); cursor: pointer; transition: all 0.15s; font-weight: 400; border: none; }
   .btn-primary { background: var(--blue); color: #fff; }
   .btn-primary:hover { background: #6ab0ff; }
@@ -47,20 +52,37 @@
   .btn-scan { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
   .btn-scan:hover { background: var(--purple); color: #fff; }
   .btn-scan:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Backend status pill */
+  .backend-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-family: var(--font-mono); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); cursor: pointer; }
+  .backend-pill.connected { border-color: var(--green-border); color: var(--green); background: var(--green-bg); }
+  .backend-pill.error { border-color: var(--red-border); color: var(--red); background: var(--red-bg); }
+  .pill-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .pill-dot.pulse { animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* Stats */
   .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
   .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
   .stat-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
   .stat-val { font-size: 26px; font-family: var(--font-mono); font-weight: 500; }
   .stat-val.blue { color: var(--blue); } .stat-val.amber { color: var(--amber); }
   .stat-val.red { color: var(--red); } .stat-val.green { color: var(--green); }
-  .ai-banner { background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: 8px; padding: 10px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--purple); font-family: var(--font-mono); }
-  .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--purple); animation: pulse 1.2s infinite; flex-shrink: 0; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  .tab { padding: 8px 18px; font-size: 13px; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+  /* Filters */
   .filters { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
   .filter-pill { padding: 5px 14px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; font-family: var(--font-sans); }
   .filter-pill:hover { border-color: var(--border2); color: var(--text); }
   .filter-pill.active { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
   .filter-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+
+  /* Issue cards */
   .issues-list { display: flex; flex-direction: column; gap: 8px; }
   .issue-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; transition: border-color 0.15s; animation: fadeIn 0.3s ease forwards; opacity: 0; }
   .issue-card:hover { border-color: var(--border2); }
@@ -71,13 +93,12 @@
   .issue-num { font-family: var(--font-mono); font-size: 11px; color: var(--hint); white-space: nowrap; margin-top: 2px; }
   .issue-title { font-size: 14px; font-weight: 500; flex: 1; line-height: 1.4; }
   .issue-actions { display: flex; gap: 8px; flex-shrink: 0; }
-  .ai-summary { font-size: 12px; color: var(--purple); background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: 5px; padding: 6px 10px; margin: 6px 0 10px 36px; line-height: 1.5; }
-  .ai-summary-label { font-size: 10px; color: var(--muted); margin-bottom: 2px; font-family: var(--font-mono); }
+  .ai-summary { font-size: 12px; color: var(--purple); background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: 5px; padding: 6px 10px; margin: 6px 0 10px 36px; line-height: 1.5; font-family: var(--font-mono); }
+  .ai-summary-label { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
   .issue-body { font-size: 12px; color: var(--muted); margin-bottom: 10px; line-height: 1.6; padding-left: 36px; }
   .issue-footer { display: flex; align-items: center; gap: 8px; padding-left: 36px; flex-wrap: wrap; }
   .badge { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono); font-weight: 500; white-space: nowrap; }
   .badge-bug { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
-  .badge-security { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
   .badge-codeql { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
   .badge-critical { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
   .badge-high { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
@@ -86,25 +107,47 @@
   .badge-ai { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
   .badge-default { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
   .issue-age { font-size: 11px; color: var(--hint); margin-left: auto; font-family: var(--font-mono); }
+
+  /* Fix button */
   .btn-fix { font-size: 11px; padding: 5px 12px; border-radius: 5px; border: 1px solid var(--blue-border); background: var(--blue-bg); color: var(--blue); cursor: pointer; font-family: var(--font-mono); transition: all 0.15s; white-space: nowrap; }
   .btn-fix:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
   .btn-fix:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-fix.running { border-color: var(--amber-border); background: var(--amber-bg); color: var(--amber); animation: pulse 1.5s infinite; }
   .btn-fix.done { border-color: var(--green-border); background: var(--green-bg); color: var(--green); }
+
+  /* Sessions tab */
+  .session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; animation: fadeIn 0.3s ease forwards; opacity: 0; }
+  .session-card:hover { border-color: var(--border2); }
+  .session-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .session-status.running { background: var(--amber); animation: pulse 1.2s infinite; }
+  .session-status.completed { background: var(--green); }
+  .session-status.blocked { background: var(--red); }
+  .session-status.stopped { background: var(--muted); }
+  .session-info { flex: 1; min-width: 0; }
+  .session-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .session-meta { font-size: 11px; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
+  .session-link { font-size: 11px; color: var(--blue); text-decoration: none; font-family: var(--font-mono); white-space: nowrap; }
+  .session-link:hover { text-decoration: underline; }
+
+  /* Loading */
   .loading { text-align: center; padding: 60px 20px; color: var(--muted); font-family: var(--font-mono); font-size: 13px; }
   .spinner { width: 24px; height: 24px; border: 2px solid var(--border2); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Modal */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 10px; padding: 28px; width: 500px; max-width: 90vw; }
   .modal h3 { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
-  .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+  .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
   .config-row { margin-bottom: 14px; }
   .config-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.06em; }
   .config-input { width: 100%; padding: 8px 12px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-family: var(--font-mono); font-size: 12px; outline: none; }
   .config-input:focus { border-color: var(--blue); }
   textarea.config-input { height: 90px; resize: vertical; font-size: 11px; }
   .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* Toast */
   .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 12px 16px; font-size: 12px; color: var(--text); font-family: var(--font-mono); z-index: 200; transform: translateY(80px); opacity: 0; transition: all 0.3s; max-width: 380px; line-height: 1.5; }
   .toast.show { transform: translateY(0); opacity: 1; }
   .toast.success { border-left: 3px solid var(--green); }
@@ -125,12 +168,12 @@
       <div class="nav-item active" onclick="setView('all',this)"><span class="nav-dot" style="background:var(--muted)"></span>all items<span class="nav-count" id="cnt-all">—</span></div>
       <div class="nav-item" onclick="setView('bug',this)"><span class="nav-dot" style="background:var(--amber)"></span>bugs<span class="nav-count" id="cnt-bug">—</span></div>
       <div class="nav-item" onclick="setView('security',this)"><span class="nav-dot" style="background:var(--red)"></span>security<span class="nav-count" id="cnt-sec">—</span></div>
-      <div class="nav-item" onclick="setView('critical',this)"><span class="nav-dot" style="background:var(--red)"></span>critical only<span class="nav-count" id="cnt-crit">—</span></div>
+      <div class="nav-item" onclick="setView('critical',this)"><span class="nav-dot" style="background:var(--red)"></span>critical<span class="nav-count" id="cnt-crit">—</span></div>
     </div>
     <div>
-      <div class="nav-label">devin</div>
-      <div class="nav-item" onclick="openConfig()"><span class="nav-dot" style="background:var(--blue)"></span>configure api</div>
-      <div class="nav-item" onclick="clearClassifications()"><span class="nav-dot" style="background:var(--hint)"></span>clear ai data</div>
+      <div class="nav-label">settings</div>
+      <div class="nav-item" onclick="openConfig()"><span class="nav-dot" style="background:var(--blue)"></span>configure backend</div>
+      <div class="nav-item" onclick="clearData()"><span class="nav-dot" style="background:var(--hint)"></span>clear local data</div>
     </div>
     <div class="sidebar-footer">
       <div style="margin-bottom:4px">repo</div>
@@ -142,12 +185,15 @@
     <div class="topbar">
       <div>
         <div class="page-title">open backlog</div>
-        <div class="page-sub" id="scan-time">fetching issues from GitHub...</div>
+        <div class="page-sub" id="scan-time">loading...</div>
       </div>
       <div class="topbar-actions">
+        <div class="backend-pill" id="backend-pill" onclick="openConfig()">
+          <span class="pill-dot pulse"></span>
+          <span id="backend-status-text">not connected</span>
+        </div>
         <button class="btn btn-ghost btn-sm" onclick="loadIssues()">↻ refresh</button>
         <button class="btn btn-scan btn-sm" id="btn-scan" onclick="runDevinScan()">✦ scan with devin</button>
-        <button class="btn btn-primary btn-sm" onclick="openConfig()">⚡ configure</button>
       </div>
     </div>
 
@@ -158,25 +204,33 @@
       <div class="stat"><div class="stat-label">sent to devin</div><div class="stat-val green" id="s-devin">0</div></div>
     </div>
 
-    <div id="ai-banner" style="display:none" class="ai-banner">
-      <span class="pulse"></span>
-      <span id="ai-banner-text">devin is classifying your backlog...</span>
-      <span style="margin-left:auto;cursor:pointer;opacity:0.6" onclick="this.parentElement.style.display='none'">✕</span>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('issues',this)">issues</div>
+      <div class="tab" onclick="switchTab('sessions',this)">devin sessions <span id="sessions-count" style="font-size:10px;color:var(--muted);font-family:var(--font-mono);margin-left:4px"></span></div>
     </div>
 
-    <div class="filters">
-      <button class="filter-pill active" onclick="filterIssues('all',this)">all</button>
-      <button class="filter-pill" onclick="filterIssues('bug',this)">bugs</button>
-      <button class="filter-pill" onclick="filterIssues('security',this)">security</button>
-      <button class="filter-pill" onclick="filterIssues('codeql',this)">codeql</button>
-      <div class="filter-sep"></div>
-      <button class="filter-pill" onclick="filterIssues('critical',this)">critical</button>
-      <button class="filter-pill" onclick="filterIssues('high',this)">high</button>
-      <button class="filter-pill" onclick="filterIssues('ai',this)">✦ ai classified</button>
+    <!-- Issues tab -->
+    <div id="tab-issues">
+      <div class="filters">
+        <button class="filter-pill active" onclick="filterIssues('all',this)">all</button>
+        <button class="filter-pill" onclick="filterIssues('bug',this)">bugs</button>
+        <button class="filter-pill" onclick="filterIssues('security',this)">security</button>
+        <button class="filter-pill" onclick="filterIssues('codeql',this)">codeql</button>
+        <div class="filter-sep"></div>
+        <button class="filter-pill" onclick="filterIssues('critical',this)">critical</button>
+        <button class="filter-pill" onclick="filterIssues('high',this)">high</button>
+        <button class="filter-pill" onclick="filterIssues('ai',this)">✦ ai classified</button>
+      </div>
+      <div class="issues-list" id="issues-list">
+        <div class="loading"><div class="spinner"></div>loading issues...</div>
+      </div>
     </div>
 
-    <div class="issues-list" id="issues-list">
-      <div class="loading"><div class="spinner"></div>loading issues...</div>
+    <!-- Sessions tab -->
+    <div id="tab-sessions" style="display:none">
+      <div id="sessions-list">
+        <div class="loading"><div class="spinner"></div>loading sessions...</div>
+      </div>
     </div>
   </main>
 </div>
@@ -184,15 +238,13 @@
 <!-- Config modal -->
 <div class="modal-overlay" id="config-modal">
   <div class="modal">
-    <h3>configure devin api</h3>
-    <div class="modal-sub">credentials stored locally in your browser only.</div>
-    <div class="config-row">
-      <div class="config-label">devin api key</div>
-      <input class="config-input" type="password" id="cfg-key" placeholder="apk_xxxx or cog_xxxx">
+    <h3>configure backend</h3>
+    <div class="modal-sub">
+      Paste your Replit backend URL below. All Devin API calls go through it — no credentials exposed in the browser.
     </div>
     <div class="config-row">
-      <div class="config-label">organization id</div>
-      <input class="config-input" type="text" id="cfg-org" placeholder="org-xxxxxxxxxxxx">
+      <div class="config-label">backend url</div>
+      <input class="config-input" type="text" id="cfg-backend" placeholder="https://your-replit.replit.app">
     </div>
     <div class="config-row">
       <div class="config-label">github repo</div>
@@ -205,7 +257,7 @@
     <div class="modal-footer">
       <button class="btn btn-ghost btn-sm" onclick="closeConfig()">cancel</button>
       <button class="btn btn-scan btn-sm" onclick="applyClassifications()">apply classifications</button>
-      <button class="btn btn-primary btn-sm" onclick="saveConfig()">save</button>
+      <button class="btn btn-primary btn-sm" onclick="saveConfig()">save & test</button>
     </div>
   </div>
 </div>
@@ -218,29 +270,32 @@ let allIssues = [];
 let aiCls = JSON.parse(localStorage.getItem('ai_cls') || '{}');
 let currentFilter = 'all';
 let currentView = 'all';
-let devinCount = 0;
+let currentTab = 'issues';
+let devinCount = parseInt(localStorage.getItem('devin_count') || '0');
+let backendOk = false;
 let config = {
-  apiKey: localStorage.getItem('devin_api_key') || '',
-  orgId: localStorage.getItem('devin_org_id') || '',
-  repo: localStorage.getItem('devin_repo') || REPO
+  backend: localStorage.getItem('backend_url') || '',
+  repo: localStorage.getItem('cfg_repo') || REPO
 };
 
-const isSec = (i, c) => i.labels.some(l => ['security','codeql'].includes(l.name.toLowerCase())) || (c && c.type === 'security');
-const isBug = (i, c) => i.labels.some(l => l.name.toLowerCase() === 'bug') || (c && c.type === 'bug');
-const getCrit = (i, c) => {
-  for (const sev of ['critical','high','medium','low']) {
-    if (i.labels.some(l => l.name.toLowerCase().includes(sev))) return sev;
+document.getElementById('s-devin').textContent = devinCount;
+
+const isSec = (i,c) => i.labels.some(l => ['security','codeql'].includes(l.name.toLowerCase())) || (c && c.type === 'security');
+const isBug = (i,c) => i.labels.some(l => l.name.toLowerCase() === 'bug') || (c && c.type === 'bug');
+const getCrit = (i,c) => {
+  for (const s of ['critical','high','medium','low']) {
+    if (i.labels.some(l => l.name.toLowerCase().includes(s))) return s;
   }
   return c ? c.criticality : null;
 };
 const timeAgo = d => {
   const days = Math.floor((Date.now() - new Date(d)) / 86400000);
   if (days === 0) return 'today';
-  if (days === 1) return '1 day ago';
-  if (days < 30) return `${days} days ago`;
+  if (days === 1) return '1d ago';
+  if (days < 30) return `${days}d ago`;
   return `${Math.floor(days/30)}mo ago`;
 };
-const badgeClass = l => {
+const badgeCls = l => {
   const s = l.toLowerCase();
   if (s === 'bug') return 'badge-bug';
   if (['security','codeql'].includes(s)) return 'badge-codeql';
@@ -251,19 +306,36 @@ const badgeClass = l => {
   return 'badge-default';
 };
 
+async function checkBackend() {
+  if (!config.backend) return;
+  try {
+    const res = await fetch(`${config.backend}/api/health`, { signal: AbortSignal.timeout(5000) });
+    if (res.ok) {
+      backendOk = true;
+      const pill = document.getElementById('backend-pill');
+      pill.className = 'backend-pill connected';
+      pill.querySelector('.pill-dot').classList.remove('pulse');
+      document.getElementById('backend-status-text').textContent = 'backend connected';
+    } else throw new Error();
+  } catch {
+    backendOk = false;
+    const pill = document.getElementById('backend-pill');
+    pill.className = 'backend-pill error';
+    document.getElementById('backend-status-text').textContent = 'backend error';
+  }
+}
+
 function renderIssue(issue, delay) {
   const c = aiCls[issue.number];
-  const sec = isSec(issue, c);
-  const bug = isBug(issue, c);
   const crit = getCrit(issue, c);
   const done = localStorage.getItem(`dsess_${issue.number}`) === 'done';
   const border = crit === 'critical' ? 'critical-border' : crit === 'high' ? 'high-border' : '';
-  const labels = issue.labels.map(l => `<span class="badge ${badgeClass(l.name)}">${l.name}</span>`).join('');
+  const labels = issue.labels.map(l => `<span class="badge ${badgeCls(l.name)}">${l.name}</span>`).join('');
   const aiType = c && !issue.labels.some(l => ['bug','security'].includes(l.name.toLowerCase())) ? `<span class="badge badge-ai">✦ ${c.type}</span>` : '';
   const aiCritBadge = c && crit && !issue.labels.some(l => l.name.toLowerCase().includes(crit)) ? `<span class="badge badge-${crit}">${crit}</span>` : '';
   const aiSummary = c && c.summary ? `<div class="ai-summary"><div class="ai-summary-label">✦ devin analysis</div>${c.summary}</div>` : '';
   const body = issue.body ? issue.body.replace(/##\s*/g,'').replace(/```[\s\S]*?```/g,'[code]').substring(0,130).trim() + '...' : '';
-  const typeKey = c ? c.type : sec ? 'security' : bug ? 'bug' : 'other';
+  const typeKey = c ? c.type : isSec(issue,c) ? 'security' : isBug(issue,c) ? 'bug' : 'other';
 
   return `<div class="issue-card ${border}" data-num="${issue.number}" data-type="${typeKey}" data-crit="${crit||''}" data-ai="${!!c}" style="animation-delay:${delay}ms">
     <div class="issue-top">
@@ -271,8 +343,10 @@ function renderIssue(issue, delay) {
       <span class="issue-title">${issue.title}</span>
       <div class="issue-actions">
         <a href="${issue.html_url}" target="_blank" style="font-size:11px;color:var(--muted);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:5px;font-family:var(--font-mono)">view</a>
-        <button class="btn-fix ${done?'done':''}" id="btn-${issue.number}" onclick="sendToDevin(${issue.number},\`${issue.title.replace(/`/g,"'")}\`,\`${body.replace(/`/g,"'")}\`)" ${done?'disabled':''}>
-          ${done ? 'sent to devin ✓' : 'fix with devin'}
+        <button class="btn-fix ${done?'done':''}" id="btn-${issue.number}"
+          onclick="sendToDevin(${issue.number},\`${issue.title.replace(/`/g,"'")}\`,\`${body.replace(/`/g,"'")}\`)"
+          ${done?'disabled':''}>
+          ${done ? 'sent ✓' : 'fix with devin'}
         </button>
       </div>
     </div>
@@ -284,6 +358,19 @@ function renderIssue(issue, delay) {
       <span class="issue-age">${timeAgo(issue.created_at)}</span>
     </div>
   </div>`;
+}
+
+function updateStats() {
+  const bugs = allIssues.filter(i => isBug(i, aiCls[i.number])).length;
+  const sec = allIssues.filter(i => isSec(i, aiCls[i.number])).length;
+  const crit = allIssues.filter(i => getCrit(i, aiCls[i.number]) === 'critical').length;
+  document.getElementById('s-total').textContent = allIssues.length;
+  document.getElementById('s-bugs').textContent = bugs;
+  document.getElementById('s-sec').textContent = sec;
+  document.getElementById('cnt-all').textContent = allIssues.length;
+  document.getElementById('cnt-bug').textContent = bugs;
+  document.getElementById('cnt-sec').textContent = sec;
+  document.getElementById('cnt-crit').textContent = crit;
 }
 
 function applyFilter() {
@@ -317,105 +404,69 @@ function setView(view, el) {
   applyFilter();
 }
 
-function updateStats() {
-  const bugs = allIssues.filter(i => isBug(i, aiCls[i.number])).length;
-  const sec = allIssues.filter(i => isSec(i, aiCls[i.number])).length;
-  const crit = allIssues.filter(i => getCrit(i, aiCls[i.number]) === 'critical').length;
-  document.getElementById('s-total').textContent = allIssues.length;
-  document.getElementById('s-bugs').textContent = bugs;
-  document.getElementById('s-sec').textContent = sec;
-  document.getElementById('cnt-all').textContent = allIssues.length;
-  document.getElementById('cnt-bug').textContent = bugs;
-  document.getElementById('cnt-sec').textContent = sec;
-  document.getElementById('cnt-crit').textContent = crit;
+function switchTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-issues').style.display = tab === 'issues' ? '' : 'none';
+  document.getElementById('tab-sessions').style.display = tab === 'sessions' ? '' : 'none';
+  if (tab === 'sessions') loadSessions();
 }
 
 async function loadIssues() {
   const list = document.getElementById('issues-list');
   list.innerHTML = '<div class="loading"><div class="spinner"></div>fetching from github...</div>';
   try {
-    const res = await fetch(`https://api.github.com/repos/${REPO}/issues?state=open&per_page=30`);
+    const res = await fetch(`https://api.github.com/repos/${config.repo}/issues?state=open&per_page=30`);
     if (!res.ok) throw new Error('GitHub API error: ' + res.status);
     allIssues = await res.json();
     updateStats();
     document.getElementById('scan-time').textContent = `${allIssues.length} open issues · synced just now`;
-    if (!allIssues.length) { list.innerHTML = '<div class="loading">no open issues found.</div>'; return; }
-    list.innerHTML = allIssues.map((issue, i) => renderIssue(issue, i * 60)).join('');
+    list.innerHTML = allIssues.length
+      ? allIssues.map((issue, i) => renderIssue(issue, i * 50)).join('')
+      : '<div class="loading">no open issues found.</div>';
     applyFilter();
   } catch(err) {
-    list.innerHTML = `<div class="loading" style="color:var(--red)">failed to load issues.<br><small>${err.message}</small></div>`;
+    list.innerHTML = `<div class="loading" style="color:var(--red)">failed to load.<br><small>${err.message}</small></div>`;
   }
 }
 
-function runDevinScan() {
-  const btn = document.getElementById('btn-scan');
-  btn.disabled = true;
-  btn.textContent = '✦ launching...';
-  document.getElementById('ai-banner').style.display = 'flex';
-  document.getElementById('ai-banner-text').textContent = '✦ devin is analyzing your backlog — paste the JSON output into configure → classifications field';
-
-  const issueList = allIssues.map(i =>
-    `#${i.number}: ${i.title}\nLabels: ${i.labels.map(l=>l.name).join(', ')||'none'}\n${(i.body||'').substring(0,200)}`
-  ).join('\n\n---\n\n');
-
-  const prompt = `You are a senior security and engineering consultant analyzing the open GitHub issues for the FinSecure API (https://github.com/${config.repo}).
-
-Classify each issue and return ONLY a JSON object — no explanation, no markdown, just raw JSON.
-
-For each issue number return:
-- type: "bug", "security", or "feature"  
-- criticality: "critical", "high", "medium", or "low"
-- summary: one sentence explaining the core problem and business risk
-
-Severity guide:
-- critical = auth bypass, SQL injection, command injection, data breach risk
-- high = functional bug affecting users or important security hardening
-- medium = degraded experience, performance, or tech debt
-- low = minor or cosmetic
-
-Open issues:
-
-${issueList}
-
-Return format:
-{"1": {"type": "security", "criticality": "critical", "summary": "..."}, "2": {...}}`;
-
-  setTimeout(() => {
-    window.open(`https://app.devin.ai/?prompt=${encodeURIComponent(prompt)}`, '_blank');
-    btn.disabled = false;
-    btn.textContent = '✦ scan with devin';
-    showToast('devin session opened — copy the JSON output and paste it in configure → classifications', 'purple');
-  }, 600);
-}
-
-function applyClassifications() {
-  const raw = document.getElementById('cfg-json').value.trim();
-  if (!raw) { closeConfig(); return; }
+async function loadSessions() {
+  const list = document.getElementById('sessions-list');
+  if (!backendOk) {
+    list.innerHTML = '<div class="loading" style="color:var(--amber)">connect your backend first — click "not connected" above</div>';
+    return;
+  }
+  list.innerHTML = '<div class="loading"><div class="spinner"></div>loading sessions...</div>';
   try {
-    const parsed = JSON.parse(raw);
-    Object.keys(parsed).forEach(k => { aiCls[parseInt(k)] = parsed[k]; });
-    localStorage.setItem('ai_cls', JSON.stringify(aiCls));
-    closeConfig();
-    document.getElementById('issues-list').innerHTML = allIssues.map((issue, i) => renderIssue(issue, i * 40)).join('');
-    updateStats();
-    applyFilter();
-    showToast(`${Object.keys(parsed).length} issues classified ✓`, 'success');
-  } catch(e) {
-    showToast('invalid JSON — check the format', 'error');
+    const res = await fetch(`${config.backend}/api/sessions`);
+    const data = await res.json();
+    const sessions = data.sessions || data.items || data || [];
+    document.getElementById('sessions-count').textContent = `(${sessions.length})`;
+    if (!sessions.length) { list.innerHTML = '<div class="loading">no sessions yet — fix an issue to create one.</div>'; return; }
+    list.innerHTML = sessions.map((s, i) => {
+      const status = s.status || s.state || 'unknown';
+      const title = s.title || s.prompt?.substring(0, 80) || `session ${s.session_id || s.id}`;
+      const sid = s.session_id || s.id || '';
+      const url = s.url || (sid ? `https://app.devin.ai/sessions/${sid}` : '#');
+      return `<div class="session-card" style="animation-delay:${i*40}ms">
+        <div class="session-status ${status}"></div>
+        <div class="session-info">
+          <div class="session-title">${title}</div>
+          <div class="session-meta">${sid ? sid.substring(0,16)+'...' : ''} · ${status}</div>
+        </div>
+        <a href="${url}" target="_blank" class="session-link">open in devin →</a>
+      </div>`;
+    }).join('');
+  } catch(err) {
+    list.innerHTML = `<div class="loading" style="color:var(--red)">failed to load sessions.<br><small>${err.message}</small></div>`;
   }
 }
 
-function clearClassifications() {
-  aiCls = {};
-  localStorage.removeItem('ai_cls');
-  loadIssues();
-  showToast('ai classifications cleared', 'info');
-}
-
-function sendToDevin(num, title, body) {
+async function sendToDevin(num, title, body) {
   const btn = document.getElementById(`btn-${num}`);
   const c = aiCls[num];
-  const ctx = c ? `Type: ${c.type} | Criticality: ${c.criticality}\nDevin analysis: ${c.summary}\n\n` : '';
+  const ctx = c ? `Type: ${c.type} | Criticality: ${c.criticality}\nAnalysis: ${c.summary}\n\n` : '';
 
   const prompt = `You are fixing a bug in the FinSecure API (https://github.com/${config.repo}).
 
@@ -431,44 +482,152 @@ Please:
 
 Stay focused on this issue only.`;
 
-  btn.textContent = 'opening devin...';
+  btn.textContent = 'sending...';
   btn.className = 'btn-fix running';
-  setTimeout(() => {
-    btn.textContent = 'sent to devin ✓';
-    btn.className = 'btn-fix done';
-    btn.disabled = true;
-    localStorage.setItem(`dsess_${num}`, 'done');
-    devinCount++;
-    document.getElementById('s-devin').textContent = devinCount;
-  }, 800);
-  showToast(`launching devin for issue #${num}...`, 'info');
-  setTimeout(() => window.open(`https://app.devin.ai/?prompt=${encodeURIComponent(prompt)}`, '_blank'), 300);
+  btn.disabled = true;
+
+  if (backendOk) {
+    try {
+      const res = await fetch(`${config.backend}/api/sessions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || res.status);
+      const sid = data.session_id || data.id;
+      const url = data.url || (sid ? `https://app.devin.ai/sessions/${sid}` : 'https://app.devin.ai');
+      btn.textContent = 'sent ✓';
+      btn.className = 'btn-fix done';
+      localStorage.setItem(`dsess_${num}`, 'done');
+      devinCount++;
+      localStorage.setItem('devin_count', devinCount);
+      document.getElementById('s-devin').textContent = devinCount;
+      showToast(`devin session created → <a href="${url}" target="_blank" style="color:var(--blue)">view session →</a>`, 'success');
+    } catch(err) {
+      btn.textContent = 'fix with devin';
+      btn.className = 'btn-fix';
+      btn.disabled = false;
+      showToast('error: ' + err.message, 'error');
+    }
+  } else {
+    // fallback: open app.devin.ai directly
+    setTimeout(() => {
+      btn.textContent = 'sent ✓';
+      btn.className = 'btn-fix done';
+      localStorage.setItem(`dsess_${num}`, 'done');
+      devinCount++;
+      localStorage.setItem('devin_count', devinCount);
+      document.getElementById('s-devin').textContent = devinCount;
+    }, 800);
+    showToast('backend not connected — opening devin directly', 'info');
+    setTimeout(() => window.open(`https://app.devin.ai/?prompt=${encodeURIComponent(prompt)}`, '_blank'), 300);
+  }
+}
+
+async function runDevinScan() {
+  const btn = document.getElementById('btn-scan');
+  btn.disabled = true;
+  btn.textContent = '✦ scanning...';
+
+  const issueList = allIssues.map(i =>
+    `#${i.number}: ${i.title}\nLabels: ${i.labels.map(l=>l.name).join(', ')||'none'}\n${(i.body||'').substring(0,200)}`
+  ).join('\n\n---\n\n');
+
+  const prompt = `You are a senior security engineer analyzing the open GitHub issues for the FinSecure API (https://github.com/${config.repo}).
+
+Classify each issue. Respond ONLY with raw JSON — no explanation, no markdown.
+
+For each issue number return:
+- type: "bug", "security", or "feature"
+- criticality: "critical", "high", "medium", or "low"
+- summary: one sentence with the core problem and business risk
+
+Severity: critical=auth bypass/injection/breach, high=functional bug or security hardening, medium=degraded experience, low=minor.
+
+Issues:
+${issueList}
+
+Format: {"1": {"type": "security", "criticality": "critical", "summary": "..."}, "2": {...}}`;
+
+  if (backendOk) {
+    try {
+      const res = await fetch(`${config.backend}/api/sessions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || res.status);
+      const url = data.url || `https://app.devin.ai/sessions/${data.session_id || data.id}`;
+      showToast(`devin scan started → <a href="${url}" target="_blank" style="color:var(--blue)">watch session →</a><br>paste JSON output in configure → classifications`, 'purple');
+    } catch(err) {
+      showToast('error starting scan: ' + err.message, 'error');
+    }
+  } else {
+    window.open(`https://app.devin.ai/?prompt=${encodeURIComponent(prompt)}`, '_blank');
+    showToast('backend not connected — session opened directly in devin.<br>paste JSON output in configure → classifications', 'purple');
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✦ scan with devin';
+}
+
+function applyClassifications() {
+  const raw = document.getElementById('cfg-json').value.trim();
+  if (!raw) { closeConfig(); return; }
+  try {
+    const parsed = JSON.parse(raw);
+    Object.keys(parsed).forEach(k => { aiCls[parseInt(k)] = parsed[k]; });
+    localStorage.setItem('ai_cls', JSON.stringify(aiCls));
+    closeConfig();
+    document.getElementById('issues-list').innerHTML = allIssues.map((i, idx) => renderIssue(i, idx * 40)).join('');
+    updateStats();
+    applyFilter();
+    showToast(`${Object.keys(parsed).length} issues classified by devin ✓`, 'success');
+  } catch(e) {
+    showToast('invalid JSON — check the format', 'error');
+  }
+}
+
+function clearData() {
+  aiCls = {};
+  localStorage.removeItem('ai_cls');
+  localStorage.removeItem('devin_count');
+  devinCount = 0;
+  document.getElementById('s-devin').textContent = 0;
+  allIssues.forEach(i => localStorage.removeItem(`dsess_${i.number}`));
+  loadIssues();
+  showToast('local data cleared', 'info');
 }
 
 function showToast(msg, type = 'info') {
   const t = document.getElementById('toast');
   t.innerHTML = msg; t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove('show'), 5000);
+  setTimeout(() => t.classList.remove('show'), 6000);
 }
+
 function openConfig() {
-  document.getElementById('cfg-key').value = config.apiKey;
-  document.getElementById('cfg-org').value = config.orgId;
+  document.getElementById('cfg-backend').value = config.backend;
   document.getElementById('cfg-repo').value = config.repo;
   document.getElementById('cfg-json').value = '';
   document.getElementById('config-modal').classList.add('open');
 }
 function closeConfig() { document.getElementById('config-modal').classList.remove('open'); }
-function saveConfig() {
-  config.apiKey = document.getElementById('cfg-key').value.trim();
-  config.orgId = document.getElementById('cfg-org').value.trim();
+async function saveConfig() {
+  config.backend = document.getElementById('cfg-backend').value.trim().replace(/\/$/, '');
   config.repo = document.getElementById('cfg-repo').value.trim();
-  localStorage.setItem('devin_api_key', config.apiKey);
-  localStorage.setItem('devin_org_id', config.orgId);
-  localStorage.setItem('devin_repo', config.repo);
+  localStorage.setItem('backend_url', config.backend);
+  localStorage.setItem('cfg_repo', config.repo);
   closeConfig();
-  showToast('config saved ✓', 'success');
+  showToast('testing backend connection...', 'info');
+  await checkBackend();
+  if (backendOk) showToast('backend connected ✓', 'success');
+  else showToast('could not reach backend — check the URL', 'error');
 }
 document.getElementById('config-modal').addEventListener('click', e => { if (e.target.id === 'config-modal') closeConfig(); });
+
+checkBackend();
 loadIssues();
 </script>
 </body>

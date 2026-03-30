@@ -433,10 +433,15 @@ let currentFilter = 'all', currentView = 'all', currentTab = 'issues';
 let backendOk = false;
 let devinCount = parseInt(localStorage.getItem('devin_count') || '0');
 let pendingRepo = null, pendingAddRepo = null;
+const DEFAULT_BACKEND = 'https://finsecure-api-production.up.railway.app';
 let config = {
-  backendUrl: (localStorage.getItem('backend_url') || '').replace(/\/+$/, ''),
+  backendUrl: (localStorage.getItem('backend_url') || DEFAULT_BACKEND).replace(/\/+$/, ''),
   notifyEmail: localStorage.getItem('notify_email') || ''
 };
+// Persist default backend on first load
+if (!localStorage.getItem('backend_url')) {
+  localStorage.setItem('backend_url', DEFAULT_BACKEND);
+}
 
 document.getElementById('m-devin').textContent = devinCount;
 
@@ -505,7 +510,7 @@ async function detectRepo(url) {
 function launchApp() {
   if (!obRepo) return;
   const backend = document.getElementById('ob-backend').value.trim().replace(/\/$/, '');
-  if (backend) { config.backend = backend; localStorage.setItem('backend_url', backend); }
+  if (backend) { config.backendUrl = backend; localStorage.setItem('backend_url', backend); }
   const email = document.getElementById('ob-email').value.trim();
   if (email) { config.notifyEmail = email; localStorage.setItem('notify_email', email); }
   addRepo(obRepo.full_name, obRepo.description || '');
@@ -537,7 +542,7 @@ function switchRepo(fullName) {
   aiCls = JSON.parse(localStorage.getItem(`ai_cls_${fullName}`) || '{}');
   renderRepoList();
   loadCurrentRepo();
-  watchRepo(fullName);
+
 }
 
 function renderRepoList() {
@@ -980,6 +985,8 @@ async function saveSettings() {
   const backendRaw = document.getElementById('s-apikey').value.trim();
   const email = document.getElementById('s-email').value.trim();
   if (backendRaw) { config.backendUrl = backendRaw.replace(/\/+$/, ''); localStorage.setItem('backend_url', config.backendUrl); }
+  // also fix legacy key
+  localStorage.setItem('backend_url', config.backendUrl);
   if (email) { config.notifyEmail = email; localStorage.setItem('notify_email', email); }
   closeModal('settings-modal');
   showToast('testing connection...', 'info');
@@ -1017,7 +1024,7 @@ if (repos.length > 0) {
   document.getElementById('onboarding').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   initApp();
-  watchRepo(currentRepo);
+  // watchRepo removed — no longer needed
   // Resume polling
   Object.keys(localStorage).forEach(key => {
     if (key.startsWith(`dsess_${currentRepo}_`)) {

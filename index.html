@@ -249,9 +249,9 @@ textarea.modal-input { height: 80px; resize: vertical; font-size: 11px; }
         <div class="ob-hint">Your Railway or Replit backend URL</div>
       </div>
       <div class="ob-field">
-        <div class="ob-label">Notification email (optional)</div>
+        <div class="ob-label">Notification email</div>
         <input class="ob-input" id="ob-email" type="email" placeholder="team@yourcompany.com">
-        <div class="ob-hint">Get notified when Devin opens a PR or needs input</div>
+        <div class="ob-hint">Get notified when Devin opens a PR, needs input, or a new security issue is detected</div>
       </div>
       <div class="ob-actions">
         <button class="ob-btn ob-btn-ghost" onclick="goStep(1)">← Back</button>
@@ -386,6 +386,10 @@ textarea.modal-input { height: 80px; resize: vertical; font-size: 11px; }
       <input class="modal-input" id="s-backend" type="text" placeholder="https://your-backend.railway.app">
     </div>
     <div class="modal-field">
+      <div class="modal-label">notification email</div>
+      <input class="modal-input" id="s-email" type="email" placeholder="team@yourcompany.com">
+    </div>
+    <div class="modal-field">
       <div class="modal-label">paste devin classification JSON</div>
       <textarea class="modal-input" id="s-json" placeholder='{"1": {"type": "security", "criticality": "critical", "summary": "..."}}'></textarea>
     </div>
@@ -409,7 +413,10 @@ let currentFilter = 'all', currentView = 'all', currentTab = 'issues';
 let backendOk = false;
 let devinCount = parseInt(localStorage.getItem('devin_count') || '0');
 let pendingRepo = null, pendingAddRepo = null;
-let config = { backend: localStorage.getItem('backend_url') || '' };
+let config = {
+  backend: localStorage.getItem('backend_url') || '',
+  notifyEmail: localStorage.getItem('notify_email') || ''
+};
 
 document.getElementById('m-devin').textContent = devinCount;
 
@@ -466,14 +473,14 @@ async function detectRepo(url) {
 function launchApp() {
   if (!obRepo) return;
   const backend = document.getElementById('ob-backend').value.trim().replace(/\/$/, '');
-  if (backend) {
-    config.backend = backend;
-    localStorage.setItem('backend_url', backend);
-  }
+  if (backend) { config.backend = backend; localStorage.setItem('backend_url', backend); }
+  const email = document.getElementById('ob-email').value.trim();
+  if (email) { config.notifyEmail = email; localStorage.setItem('notify_email', email); }
   addRepo(obRepo.full_name, obRepo.description || '');
   document.getElementById('onboarding').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   initApp();
+  watchRepo(obRepo.full_name);
 }
 
 // ── REPO MANAGEMENT ──
@@ -498,6 +505,7 @@ function switchRepo(fullName) {
   aiCls = JSON.parse(localStorage.getItem(`ai_cls_${fullName}`) || '{}');
   renderRepoList();
   loadCurrentRepo();
+  watchRepo(fullName);
 }
 
 function renderRepoList() {
@@ -776,7 +784,7 @@ Stay focused on this issue only.`;
       const res = await fetch(`${config.backend}/sessions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, issue_number: num, issue_title: title })
+        body: JSON.stringify({ prompt, issue_number: num, issue_title: title, repo: currentRepo, notify_email: config.notifyEmail })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || res.status);
@@ -907,12 +915,15 @@ Format: {"1": {"type": "security", "criticality": "critical", "summary": "..."}}
 // ── SETTINGS ──
 function openSettings() {
   document.getElementById('s-backend').value = config.backend;
+  document.getElementById('s-email').value = config.notifyEmail || '';
   document.getElementById('s-json').value = '';
   document.getElementById('settings-modal').classList.add('open');
 }
 async function saveSettings() {
   config.backend = document.getElementById('s-backend').value.trim().replace(/\/$/, '');
   localStorage.setItem('backend_url', config.backend);
+  const email = document.getElementById('s-email').value.trim();
+  if (email) { config.notifyEmail = email; localStorage.setItem('notify_email', email); }
   closeModal('settings-modal');
   showToast('testing connection...', 'info');
   await checkBackend();
@@ -936,6 +947,18 @@ function applyClassifications() {
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
 
+async function watchRepo(repo) {
+  if (!backendOk || !repo) return;
+  try {
+    await fetch(`${config.backend}/watch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ repo, notify_email: config.notifyEmail })
+    });
+    console.log(`[watch] registered ${repo} for security monitoring`);
+  } catch(e) { console.log('[watch error]', e); }
+}
+
 function showToast(msg, type = 'info') {
   const t = document.getElementById('toast');
   t.innerHTML = msg; t.className = `toast ${type} show`;
@@ -949,6 +972,7 @@ if (repos.length > 0) {
   document.getElementById('onboarding').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   initApp();
+  watchRepo(currentRepo);
   // Resume polling
   Object.keys(localStorage).forEach(key => {
     if (key.startsWith(`dsess_${currentRepo}_`)) {

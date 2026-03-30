@@ -18,9 +18,10 @@ def create_token(user_id: str, role: str) -> str:
 
 def validate_token(token: str) -> Optional[dict]:
     try:
-        # BUG: expiration verification is disabled
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM], options={"verify_exp": False})
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
+    except jwt.ExpiredSignatureError:
+        return None
     except jwt.InvalidTokenError:
         return None
 

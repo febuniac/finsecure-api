@@ -242,18 +242,27 @@ textarea.modal-input { height: 80px; resize: vertical; font-size: 11px; }
     <!-- Step 2: Devin config -->
     <div id="ob-step-2" style="display:none">
       <div class="ob-title">Connect Devin</div>
-      <div class="ob-sub">Add your Devin API credentials. These stay in your browser only — we never send them anywhere else.</div>
+      <div class="ob-sub">You need a small backend running on Railway (or any host) that holds your Devin API key securely. <a href="https://github.com/febuniac/finsecure-api" target="_blank" style="color:var(--blue)">See setup guide →</a></div>
+
       <div class="ob-field">
         <div class="ob-label">Backend URL</div>
-        <input class="ob-input" id="ob-backend" type="text" placeholder="https://your-backend.railway.app">
-        <div class="ob-hint">Your Railway or Replit backend URL</div>
+        <input class="ob-input" id="ob-backend" type="text" placeholder="https://your-app.up.railway.app" oninput="testBackend(this.value)">
+        <div class="ob-hint" id="ob-backend-hint">Paste your Railway deployment URL</div>
       </div>
+
       <div class="ob-field">
         <div class="ob-label">Notification email</div>
         <input class="ob-input" id="ob-email" type="email" placeholder="team@yourcompany.com">
-        <div class="ob-hint">Get notified when Devin opens a PR, needs input, or a new security issue is detected</div>
+        <div class="ob-hint">Get alerted when Devin opens a PR, needs input, or a new security issue appears</div>
       </div>
-      <div class="ob-actions">
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:4px;font-size:11px;color:var(--muted);font-family:var(--font-mono);line-height:1.8">
+        <div style="color:var(--blue);margin-bottom:4px">railway env variables needed:</div>
+        <div>DEVIN_API_KEY &nbsp;·&nbsp; DEVIN_ORG_ID &nbsp;·&nbsp; SENDGRID_API_KEY</div>
+        <div>NOTIFY_EMAIL &nbsp;·&nbsp; FROM_EMAIL</div>
+      </div>
+
+      <div class="ob-actions" style="margin-top:16px">
         <button class="ob-btn ob-btn-ghost" onclick="goStep(1)">← Back</button>
         <button class="ob-btn ob-btn-primary" onclick="goStep(3)">Continue →</button>
       </div>
@@ -378,21 +387,30 @@ textarea.modal-input { height: 80px; resize: vertical; font-size: 11px; }
 
 <!-- Settings modal -->
 <div class="modal-overlay" id="settings-modal">
-  <div class="modal">
+  <div class="modal" style="width:520px">
     <h3>settings</h3>
-    <div class="modal-sub">Backend and notification configuration.</div>
-    <div class="modal-field">
-      <div class="modal-label">backend URL</div>
-      <input class="modal-input" id="s-backend" type="text" placeholder="https://your-backend.railway.app">
+    <div class="modal-sub">Configure your backend and notifications.</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div class="modal-field" style="margin:0">
+        <div class="modal-label">backend URL</div>
+        <input class="modal-input" id="s-backend" type="text" placeholder="https://your.railway.app">
+      </div>
+      <div class="modal-field" style="margin:0">
+        <div class="modal-label">notification email</div>
+        <input class="modal-input" id="s-email" type="email" placeholder="team@company.com">
+      </div>
     </div>
+
     <div class="modal-field">
-      <div class="modal-label">notification email</div>
-      <input class="modal-input" id="s-email" type="email" placeholder="team@yourcompany.com">
+      <div class="modal-label">paste devin classification JSON (optional)</div>
+      <textarea class="modal-input" id="s-json" style="height:70px" placeholder='{"1": {"type": "security", "criticality": "critical", "summary": "..."}}'></textarea>
     </div>
-    <div class="modal-field">
-      <div class="modal-label">paste devin classification JSON</div>
-      <textarea class="modal-input" id="s-json" placeholder='{"1": {"type": "security", "criticality": "critical", "summary": "..."}}'></textarea>
+
+    <div style="background:var(--surface2);border-radius:6px;padding:10px 14px;margin-bottom:4px;font-size:11px;color:var(--muted);font-family:var(--font-mono);line-height:1.6">
+      <span style="color:var(--blue)">backend variables needed:</span> DEVIN_API_KEY · DEVIN_ORG_ID · SENDGRID_API_KEY · NOTIFY_EMAIL · FROM_EMAIL
     </div>
+
     <div class="modal-footer">
       <button class="btn btn-ghost btn-sm" onclick="closeModal('settings-modal')">cancel</button>
       <button class="btn btn-scan btn-sm" onclick="applyClassifications()">apply classifications</button>
@@ -435,6 +453,18 @@ function goStep(n) {
     document.getElementById('ob-confirm-repo').textContent = obRepo.full_name;
     document.getElementById('ob-confirm-desc').textContent = obRepo.description || 'No description';
   }
+}
+
+async function testBackend(url) {
+  const hint = document.getElementById('ob-backend-hint');
+  if (!url || !url.startsWith('http')) { hint.textContent = 'Paste your Railway deployment URL'; hint.className = 'ob-hint'; return; }
+  hint.textContent = 'testing...'; hint.className = 'ob-hint';
+  try {
+    const clean = url.trim().replace(/\/$/, '');
+    const res = await fetch(`${clean}/health`, { signal: AbortSignal.timeout(5000) });
+    if (res.ok) { hint.textContent = '✓ backend connected'; hint.className = 'ob-hint green'; }
+    else throw new Error();
+  } catch { hint.textContent = 'could not reach backend — check the URL'; hint.className = 'ob-hint red'; }
 }
 
 async function detectRepo(url) {

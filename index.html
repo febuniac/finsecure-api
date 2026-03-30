@@ -403,9 +403,9 @@ let currentFilter = 'all', currentView = 'all', currentTab = 'issues';
 let devinCount = 0;
 let pendingRepo = null;
 
-const DEVIN_BASE = () => `https://api.devin.ai/v3/organizations/${devinOrgId}`;
+const BACKEND = 'https://finsecure-api-production.up.railway.app';
 const isDevinReady = () => !!(devinApiKey && devinOrgId);
-const devinHeaders = () => ({ 'Authorization': `Bearer ${devinApiKey}`, 'Content-Type': 'application/json' });
+const devinHeaders = () => ({'Authorization': `Bearer ${devinApiKey}`, 'Content-Type': 'application/json'});
 
 // ═══════════════════════════ ONBOARDING ═══════════════════════════
 let obStep = 1;
@@ -749,7 +749,7 @@ async function loadSessions() {
   }
   list.innerHTML = '<div class="loading"><div class="spinner"></div>loading sessions...</div>';
   try {
-    const res = await fetch(`${DEVIN_BASE()}/sessions`, { headers: devinHeaders() });
+    const res = await fetch(`${BACKEND}/sessions`);
     if (!res.ok) throw new Error('API ' + res.status);
     const data = await res.json();
     const sessions = Array.isArray(data) ? data : (data.sessions || data.items || []);
@@ -813,9 +813,9 @@ Stay focused on this issue only.`;
   if (btn) { btn.textContent = 'sending...'; btn.className = 'fix-btn running'; btn.disabled = true; }
 
   try {
-    const res = await fetch(`${DEVIN_BASE()}/sessions`, {
+    const res = await fetch(`${BACKEND}/sessions`, {
       method: 'POST',
-      headers: devinHeaders(),
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt })
     });
     const data = await res.json();
@@ -839,7 +839,7 @@ function startPolling(issueNum, sessionId) {
   const iv = setInterval(async () => {
     if (++attempts > 40) { clearInterval(iv); return; }
     try {
-      const res = await fetch(`${DEVIN_BASE()}/sessions/${sessionId}`, { headers: devinHeaders() });
+      const res = await fetch(`${BACKEND}/sessions/${sessionId}`);
       if (!res.ok) return;
       const data = await res.json();
       const status = data.status || 'running';
@@ -882,8 +882,9 @@ ${issueList}
 Format: {"1": {"type": "security", "criticality": "critical", "summary": "..."}}`;
 
   try {
-    const res = await fetch(`${DEVIN_BASE()}/sessions`, {
-      method: 'POST', headers: devinHeaders(),
+    const res = await fetch(`${BACKEND}/sessions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt })
     });
     const data = await res.json();

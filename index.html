@@ -396,15 +396,9 @@ textarea.modal-input { height: 80px; resize: vertical; font-size: 11px; }
     <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Credentials stored locally in your browser only.</div>
 
     <div class="modal-field">
-      <div class="modal-label">devin api key</div>
-      <input class="modal-input" id="s-apikey" type="password" placeholder="apk_xxxx or cog_xxxx">
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">app.devin.ai → Settings → Service Users → generate API key</div>
-    </div>
-
-    <div class="modal-field">
-      <div class="modal-label">organization id</div>
-      <input class="modal-input" id="s-orgid" type="text" placeholder="org-xxxxxxxxxxxx">
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Same page — shown at the top as "Organization ID"</div>
+      <div class="modal-label">backend URL</div>
+      <input class="modal-input" id="s-apikey" type="text" placeholder="https://your-app.up.railway.app" oninput="testBackendLive(this.value)">
+      <div style="font-size:11px;color:var(--muted);margin-top:4px" id="s-backend-status">Your Railway backend URL — holds your Devin API key securely</div>
     </div>
 
     <div class="modal-field">
@@ -440,8 +434,7 @@ let backendOk = false;
 let devinCount = parseInt(localStorage.getItem('devin_count') || '0');
 let pendingRepo = null, pendingAddRepo = null;
 let config = {
-  apiKey: localStorage.getItem('devin_api_key') || '',
-  orgId: localStorage.getItem('devin_org_id') || '',
+  backendUrl: (localStorage.getItem('backend_url') || '').replace(/\/+$/, ''),
   notifyEmail: localStorage.getItem('notify_email') || ''
 };
 
@@ -615,12 +608,22 @@ async function testBackendLive(url) {
 }
 
 async function checkBackend() {
-  if (config.apiKey && config.orgId) {
-    backendOk = true;
-    const pill = document.getElementById('backend-pill');
-    pill.className = 'backend-pill connected';
-    document.getElementById('pill-dot').classList.remove('pulse');
-    document.getElementById('pill-text').textContent = 'devin connected';
+  if (!config.backendUrl) return;
+  try {
+    const res = await fetch(`${config.backendUrl}/health`, { signal: AbortSignal.timeout(5000) });
+    if (res.ok) {
+      backendOk = true;
+      const pill = document.getElementById('backend-pill');
+      pill.className = 'backend-pill connected';
+      document.getElementById('pill-dot').classList.remove('pulse');
+      document.getElementById('pill-text').textContent = 'devin connected';
+      const badge = document.getElementById('setup-status-badge');
+      if (badge) { badge.textContent = '✓ connected'; badge.style.borderColor = 'var(--green-border)'; badge.style.color = 'var(--green)'; badge.style.background = 'var(--green-bg)'; }
+    } else throw new Error();
+  } catch {
+    backendOk = false;
+    document.getElementById('backend-pill').className = 'backend-pill error';
+    document.getElementById('pill-text').textContent = 'backend error';
   }
 }
 
@@ -821,22 +824,22 @@ Stay focused on this issue only.`;
 
   if (btn) { btn.textContent = 'sending...'; btn.className = 'btn-fix running'; btn.disabled = true; }
 
-  if (!config.apiKey || !config.orgId) {
+  if (!config.backendUrl) {
     showToast('connect devin first — click to set up', 'error');
     openSettings();
     if (btn) { btn.textContent = 'fix with devin'; btn.className = 'btn-fix'; btn.disabled = false; }
     return;
   }
   try {
-    const res = await fetch(`https://api.devin.ai/v3/organizations/${config.orgId}/sessions`, {
+    const res = await fetch(`${config.backendUrl}/sessions`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${config.apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, issue_number: num, issue_title: title, repo: currentRepo, notify_email: config.notifyEmail })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || data.error || res.status);
     const sid = data.session_id || data.id;
-    const url = data.url || (sid ? `https://app.devin.ai/sessions/${sid}` : 'https://app.devin.ai');
+    const url = data.session_url || data.url || (sid ? `https://app.devin.ai/sessions/${sid}` : 'https://app.devin.ai');
     localStorage.setItem(`dsess_${currentRepo}_${num}`, sid || 'done');
     devinCount++;
     localStorage.setItem('devin_count', devinCount);
@@ -846,12 +849,7 @@ Stay focused on this issue only.`;
     if (sid) startPolling(num, sid);
   } catch(err) {
     if (btn) { btn.textContent = 'fix with devin'; btn.className = 'btn-fix'; btn.disabled = false; }
-    if (err.message.includes('Failed to fetch')) {
-      showToast('CORS blocked — opening devin directly', 'info');
-      setTimeout(() => window.open(`https://app.devin.ai/?prompt=${encodeURIComponent(prompt)}`, '_blank'), 300);
-    } else {
-      showToast('error: ' + err.message, 'error');
-    }
+    showToast('error: ' + err.message, 'error');
     return;
   }
   if (false) {
@@ -873,9 +871,7 @@ function startPolling(issueNum, sessionId) {
     attempts++;
     if (attempts > 40) { clearInterval(interval); return; }
     try {
-      const res = await fetch(`https://api.devin.ai/v3/organizations/${config.orgId}/sessions/${sessionId}`, {
-        headers: { 'Authorization': `Bearer ${config.apiKey}` }
-      });
+      const res = await fetch(`${config.backendUrl}/sessions/${sessionId}`);
       if (!res.ok) return;
       const data = await res.json();
       const status = data.status || data.state || 'running';
@@ -905,9 +901,7 @@ async function loadSessions() {
   if (!backendOk) { list.innerHTML = '<div class="loading" style="color:var(--amber)">connect your backend in settings</div>'; return; }
   list.innerHTML = '<div class="loading"><div class="spinner"></div>loading sessions...</div>';
   try {
-    const res = await fetch(`https://api.devin.ai/v3/organizations/${config.orgId}/sessions`, {
-      headers: { 'Authorization': `Bearer ${config.apiKey}` }
-    });
+    const res = await fetch(`${config.backendUrl}/sessions`);
     const data = await res.json();
     const sessions = data.sessions || data.items || data || [];
     document.getElementById('sess-count').textContent = `(${sessions.length})`;
@@ -972,8 +966,7 @@ Format: {"1": {"type": "security", "criticality": "critical", "summary": "..."}}
 
 // ── SETTINGS ──
 function openSettings() {
-  document.getElementById('s-apikey').value = config.apiKey;
-  document.getElementById('s-orgid').value = config.orgId;
+  document.getElementById('s-apikey').value = config.backendUrl || '';
   document.getElementById('s-email').value = config.notifyEmail || '';
   document.getElementById('s-json').value = '';
   document.getElementById('settings-modal').classList.add('open');
@@ -984,26 +977,14 @@ function openSettings() {
   }
 }
 async function saveSettings() {
-  config.apiKey = document.getElementById('s-apikey').value.trim();
-  config.orgId = document.getElementById('s-orgid').value.trim();
+  const backendRaw = document.getElementById('s-apikey').value.trim();
   const email = document.getElementById('s-email').value.trim();
-  if (email) config.notifyEmail = email;
-  localStorage.setItem('devin_api_key', config.apiKey);
-  localStorage.setItem('devin_org_id', config.orgId);
-  localStorage.setItem('notify_email', config.notifyEmail);
+  if (backendRaw) { config.backendUrl = backendRaw.replace(/\/+$/, ''); localStorage.setItem('backend_url', config.backendUrl); }
+  if (email) { config.notifyEmail = email; localStorage.setItem('notify_email', email); }
   closeModal('settings-modal');
-  if (config.apiKey && config.orgId) {
-    const pill = document.getElementById('backend-pill');
-    pill.className = 'backend-pill connected';
-    document.getElementById('pill-dot').classList.remove('pulse');
-    document.getElementById('pill-text').textContent = 'devin connected';
-    backendOk = true;
-    const badge = document.getElementById('setup-status-badge');
-    if (badge) { badge.textContent = '✓ connected'; badge.style.borderColor = 'var(--green-border)'; badge.style.color = 'var(--green)'; badge.style.background = 'var(--green-bg)'; }
-    showToast('devin connected ✓', 'success');
-  } else {
-    showToast('add your API key and org ID to connect', 'error');
-  }
+  showToast('testing connection...', 'info');
+  await checkBackend();
+  showToast(backendOk ? 'devin connected ✓' : 'could not reach backend — check URL', backendOk ? 'success' : 'error');
 }
 function applyClassifications() {
   const raw = document.getElementById('s-json').value.trim();

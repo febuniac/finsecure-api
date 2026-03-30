@@ -387,54 +387,39 @@ textarea.modal-input { height: 80px; resize: vertical; font-size: 11px; }
 
 <!-- Settings / Devin Setup modal -->
 <div class="modal-overlay" id="settings-modal">
-  <div class="modal" style="width:540px;max-height:90vh;overflow-y:auto">
+  <div class="modal" style="width:500px">
 
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div>
-        <h3 style="margin:0">connect devin</h3>
-        <div style="font-size:12px;color:var(--muted);margin-top:3px">Configure your backend and notifications</div>
-      </div>
-      <div id="setup-status-badge" style="font-size:11px;font-family:var(--font-mono);padding:4px 10px;border-radius:20px;border:1px solid var(--border);color:var(--muted)">not connected</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <h3 style="margin:0">connect devin</h3>
+      <div id="setup-status-badge" style="font-size:11px;font-family:var(--font-mono);padding:3px 10px;border-radius:20px;border:1px solid var(--border);color:var(--muted)">not connected</div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Credentials stored locally in your browser only.</div>
+
+    <div class="modal-field">
+      <div class="modal-label">devin api key</div>
+      <input class="modal-input" id="s-apikey" type="password" placeholder="apk_xxxx or cog_xxxx">
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">app.devin.ai → Settings → Service Users → generate API key</div>
     </div>
 
-    <!-- Step 1: Backend -->
-    <div style="border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div style="width:22px;height:22px;border-radius:50%;background:var(--blue-bg);border:1px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--blue);font-family:var(--font-mono);flex-shrink:0">1</div>
-        <div style="font-size:13px;font-weight:500">Backend URL</div>
-        <div id="s-backend-status" style="margin-left:auto;font-size:11px;font-family:var(--font-mono);color:var(--muted)"></div>
-      </div>
-      <input class="modal-input" id="s-backend" type="text" placeholder="https://your-app.up.railway.app" oninput="testBackendLive(this.value)">
-      <div style="font-size:11px;color:var(--muted);margin-top:6px;font-family:var(--font-mono)">
-        Deploy <a href="https://github.com/febuniac/finsecure-api/blob/main/main.py" target="_blank" style="color:var(--blue)">main.py</a> on Railway with these env vars:
-        <span style="color:var(--hint)">DEVIN_API_KEY · DEVIN_ORG_ID · SENDGRID_API_KEY · NOTIFY_EMAIL · FROM_EMAIL</span>
-      </div>
+    <div class="modal-field">
+      <div class="modal-label">organization id</div>
+      <input class="modal-input" id="s-orgid" type="text" placeholder="org-xxxxxxxxxxxx">
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Same page — shown at the top as "Organization ID"</div>
     </div>
 
-    <!-- Step 2: Notification email -->
-    <div style="border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div style="width:22px;height:22px;border-radius:50%;background:var(--purple-bg);border:1px solid var(--purple-border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--purple);font-family:var(--font-mono);flex-shrink:0">2</div>
-        <div style="font-size:13px;font-weight:500">Notification email</div>
-        <div style="font-size:11px;color:var(--hint);margin-left:auto">optional</div>
-      </div>
+    <div class="modal-field">
+      <div class="modal-label">notification email <span style="color:var(--hint);font-size:10px;font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></div>
       <input class="modal-input" id="s-email" type="email" placeholder="team@yourcompany.com">
-      <div style="font-size:11px;color:var(--muted);margin-top:6px">Alerts when Devin opens a PR, gets blocked, or a new security issue appears</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Requires backend — alerts for PR opened, Devin blocked, new security issues</div>
     </div>
 
-    <!-- Step 3: AI classifications -->
-    <div style="border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div style="width:22px;height:22px;border-radius:50%;background:var(--purple-bg);border:1px solid var(--purple-border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--purple);font-family:var(--font-mono);flex-shrink:0">3</div>
-        <div style="font-size:13px;font-weight:500">AI classifications</div>
-        <div style="font-size:11px;color:var(--hint);margin-left:auto">optional</div>
-      </div>
-      <textarea class="modal-input" id="s-json" style="height:65px" placeholder='Paste JSON from "scan with devin" → {"1": {"type": "security", "criticality": "critical", "summary": "..."}}'></textarea>
-      <div style="font-size:11px;color:var(--muted);margin-top:6px">Run "✦ scan with devin" first, then paste the JSON output here to classify all issues automatically</div>
-    </div>
+    <div style="border-top:1px solid var(--border);margin:16px 0 14px"></div>
 
-    <div class="modal-footer" style="margin-top:0">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;font-weight:500">AI classifications (optional)</div>
+    <textarea class="modal-input" id="s-json" style="height:65px" placeholder='Paste JSON from "✦ scan with devin" → {"1": {"type": "security", "criticality": "critical", "summary": "..."}}'></textarea>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;margin-bottom:4px">Run "✦ scan with devin" first, paste the JSON output here</div>
+
+    <div class="modal-footer" style="margin-top:16px">
       <button class="btn btn-ghost btn-sm" onclick="closeModal('settings-modal')">cancel</button>
       <button class="btn btn-scan btn-sm" onclick="applyClassifications()">apply classifications</button>
       <button class="btn btn-primary btn-sm" onclick="saveSettings()">save & connect</button>
@@ -455,7 +440,8 @@ let backendOk = false;
 let devinCount = parseInt(localStorage.getItem('devin_count') || '0');
 let pendingRepo = null, pendingAddRepo = null;
 let config = {
-  backend: localStorage.getItem('backend_url') || '',
+  apiKey: localStorage.getItem('devin_api_key') || '',
+  orgId: localStorage.getItem('devin_org_id') || '',
   notifyEmail: localStorage.getItem('notify_email') || ''
 };
 
@@ -629,22 +615,12 @@ async function testBackendLive(url) {
 }
 
 async function checkBackend() {
-  if (!config.backend) return;
-  try {
-    const res = await fetch(`${config.backend}/health`, { signal: AbortSignal.timeout(5000) });
-    if (res.ok) {
-      backendOk = true;
-      const pill = document.getElementById('backend-pill');
-      pill.className = 'backend-pill connected';
-      document.getElementById('pill-dot').classList.remove('pulse');
-      document.getElementById('pill-text').textContent = 'backend connected';
-      const badge = document.getElementById('setup-status-badge');
-      if (badge) { badge.textContent = '✓ connected'; badge.style.borderColor = 'var(--green-border)'; badge.style.color = 'var(--green)'; badge.style.background = 'var(--green-bg)'; }
-    } else throw new Error();
-  } catch {
-    backendOk = false;
-    document.getElementById('backend-pill').className = 'backend-pill error';
-    document.getElementById('pill-text').textContent = 'backend error';
+  if (config.apiKey && config.orgId) {
+    backendOk = true;
+    const pill = document.getElementById('backend-pill');
+    pill.className = 'backend-pill connected';
+    document.getElementById('pill-dot').classList.remove('pulse');
+    document.getElementById('pill-text').textContent = 'devin connected';
   }
 }
 
@@ -845,34 +821,40 @@ Stay focused on this issue only.`;
 
   if (btn) { btn.textContent = 'sending...'; btn.className = 'btn-fix running'; btn.disabled = true; }
 
-  if (!backendOk && !config.backend) {
-    showToast('backend not configured — click to set up', 'error');
+  if (!config.apiKey || !config.orgId) {
+    showToast('connect devin first — click to set up', 'error');
     openSettings();
     if (btn) { btn.textContent = 'fix with devin'; btn.className = 'btn-fix'; btn.disabled = false; }
     return;
   }
-  if (backendOk) {
-    try {
-      const res = await fetch(`${config.backend}/sessions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, issue_number: num, issue_title: title, repo: currentRepo, notify_email: config.notifyEmail })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || res.status);
-      const sid = data.session_id || data.id;
-      const url = data.session_url || data.url || `https://app.devin.ai/sessions/${sid}`;
-      localStorage.setItem(`dsess_${currentRepo}_${num}`, sid || 'done');
-      devinCount++;
-      localStorage.setItem('devin_count', devinCount);
-      document.getElementById('m-devin').textContent = devinCount;
-      showToast(`session started → <a href="${url}" target="_blank" style="color:var(--blue)">watch devin →</a>`, 'success');
-      if (sid) startPolling(num, sid);
-    } catch(err) {
-      if (btn) { btn.textContent = 'fix with devin'; btn.className = 'btn-fix'; btn.disabled = false; }
+  try {
+    const res = await fetch(`https://api.devin.ai/v3/organizations/${config.orgId}/sessions`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${config.apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || data.error || res.status);
+    const sid = data.session_id || data.id;
+    const url = data.url || (sid ? `https://app.devin.ai/sessions/${sid}` : 'https://app.devin.ai');
+    localStorage.setItem(`dsess_${currentRepo}_${num}`, sid || 'done');
+    devinCount++;
+    localStorage.setItem('devin_count', devinCount);
+    document.getElementById('m-devin').textContent = devinCount;
+    if (btn) { btn.textContent = 'devin working...'; btn.className = 'btn-fix running'; }
+    showToast(`session started → <a href="${url}" target="_blank" style="color:var(--blue)">watch devin →</a>`, 'success');
+    if (sid) startPolling(num, sid);
+  } catch(err) {
+    if (btn) { btn.textContent = 'fix with devin'; btn.className = 'btn-fix'; btn.disabled = false; }
+    if (err.message.includes('Failed to fetch')) {
+      showToast('CORS blocked — opening devin directly', 'info');
+      setTimeout(() => window.open(`https://app.devin.ai/?prompt=${encodeURIComponent(prompt)}`, '_blank'), 300);
+    } else {
       showToast('error: ' + err.message, 'error');
     }
-  } else {
+    return;
+  }
+  if (false) {
     setTimeout(() => {
       if (btn) { btn.textContent = 'sent ✓'; btn.className = 'btn-fix done'; btn.disabled = true; }
       localStorage.setItem(`dsess_${currentRepo}_${num}`, 'done');
@@ -891,7 +873,9 @@ function startPolling(issueNum, sessionId) {
     attempts++;
     if (attempts > 40) { clearInterval(interval); return; }
     try {
-      const res = await fetch(`${config.backend}/sessions/${sessionId}`);
+      const res = await fetch(`https://api.devin.ai/v3/organizations/${config.orgId}/sessions/${sessionId}`, {
+        headers: { 'Authorization': `Bearer ${config.apiKey}` }
+      });
       if (!res.ok) return;
       const data = await res.json();
       const status = data.status || data.state || 'running';
@@ -921,7 +905,9 @@ async function loadSessions() {
   if (!backendOk) { list.innerHTML = '<div class="loading" style="color:var(--amber)">connect your backend in settings</div>'; return; }
   list.innerHTML = '<div class="loading"><div class="spinner"></div>loading sessions...</div>';
   try {
-    const res = await fetch(`${config.backend}/sessions`);
+    const res = await fetch(`https://api.devin.ai/v3/organizations/${config.orgId}/sessions`, {
+      headers: { 'Authorization': `Bearer ${config.apiKey}` }
+    });
     const data = await res.json();
     const sessions = data.sessions || data.items || data || [];
     document.getElementById('sess-count').textContent = `(${sessions.length})`;
@@ -986,7 +972,8 @@ Format: {"1": {"type": "security", "criticality": "critical", "summary": "..."}}
 
 // ── SETTINGS ──
 function openSettings() {
-  document.getElementById('s-backend').value = config.backend;
+  document.getElementById('s-apikey').value = config.apiKey;
+  document.getElementById('s-orgid').value = config.orgId;
   document.getElementById('s-email').value = config.notifyEmail || '';
   document.getElementById('s-json').value = '';
   document.getElementById('settings-modal').classList.add('open');
@@ -995,17 +982,28 @@ function openSettings() {
     if (backendOk) { badge.textContent = '✓ connected'; badge.style.borderColor = 'var(--green-border)'; badge.style.color = 'var(--green)'; badge.style.background = 'var(--green-bg)'; }
     else { badge.textContent = 'not connected'; badge.style.borderColor = 'var(--border)'; badge.style.color = 'var(--muted)'; badge.style.background = 'transparent'; }
   }
-  if (config.backend) testBackendLive(config.backend);
 }
 async function saveSettings() {
-  config.backend = document.getElementById('s-backend').value.trim().replace(/\/$/, '');
-  localStorage.setItem('backend_url', config.backend);
+  config.apiKey = document.getElementById('s-apikey').value.trim();
+  config.orgId = document.getElementById('s-orgid').value.trim();
   const email = document.getElementById('s-email').value.trim();
-  if (email) { config.notifyEmail = email; localStorage.setItem('notify_email', email); }
+  if (email) config.notifyEmail = email;
+  localStorage.setItem('devin_api_key', config.apiKey);
+  localStorage.setItem('devin_org_id', config.orgId);
+  localStorage.setItem('notify_email', config.notifyEmail);
   closeModal('settings-modal');
-  showToast('testing connection...', 'info');
-  await checkBackend();
-  showToast(backendOk ? 'backend connected ✓' : 'could not reach backend', backendOk ? 'success' : 'error');
+  if (config.apiKey && config.orgId) {
+    const pill = document.getElementById('backend-pill');
+    pill.className = 'backend-pill connected';
+    document.getElementById('pill-dot').classList.remove('pulse');
+    document.getElementById('pill-text').textContent = 'devin connected';
+    backendOk = true;
+    const badge = document.getElementById('setup-status-badge');
+    if (badge) { badge.textContent = '✓ connected'; badge.style.borderColor = 'var(--green-border)'; badge.style.color = 'var(--green)'; badge.style.background = 'var(--green-bg)'; }
+    showToast('devin connected ✓', 'success');
+  } else {
+    showToast('add your API key and org ID to connect', 'error');
+  }
 }
 function applyClassifications() {
   const raw = document.getElementById('s-json').value.trim();
@@ -1024,18 +1022,6 @@ function applyClassifications() {
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
-
-async function watchRepo(repo) {
-  if (!backendOk || !repo) return;
-  try {
-    await fetch(`${config.backend}/watch`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ repo, notify_email: config.notifyEmail })
-    });
-    console.log(`[watch] registered ${repo} for security monitoring`);
-  } catch(e) { console.log('[watch error]', e); }
-}
 
 function showToast(msg, type = 'info') {
   const t = document.getElementById('toast');

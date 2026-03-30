@@ -3,261 +3,396 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FinSecure — Backlog Resolver</title>
+<title>Backlog Resolver — powered by Devin</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #0e0f11; --surface: #16181c; --surface2: #1e2026;
-    --border: #2a2d35; --border2: #3a3e48; --text: #e8eaf0;
-    --muted: #7a7f8e; --hint: #4a4f5e;
-    --blue: #4a9eff; --blue-bg: #0d1f35; --blue-border: #1a3a5c;
-    --amber: #f0a030; --amber-bg: #2a1a08; --amber-border: #4a3010;
-    --red: #ff5a5a; --red-bg: #2a0d0d; --red-border: #4a1a1a;
-    --green: #3dcc7e; --green-bg: #0d2a1a; --green-border: #1a4a2a;
-    --purple: #a78bfa; --purple-bg: #1a1030; --purple-border: #3a2860;
-    --font-mono: 'IBM Plex Mono', monospace;
-    --font-sans: 'IBM Plex Sans', sans-serif;
-  }
-  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 14px; line-height: 1.6; min-height: 100vh; }
-  .layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0e0f11; --surface: #16181c; --surface2: #1e2026;
+  --border: #2a2d35; --border2: #3a3e48; --text: #e8eaf0;
+  --muted: #7a7f8e; --hint: #4a4f5e;
+  --blue: #4a9eff; --blue-bg: #0d1f35; --blue-border: #1a3a5c;
+  --amber: #f0a030; --amber-bg: #2a1a08; --amber-border: #4a3010;
+  --red: #ff5a5a; --red-bg: #2a0d0d; --red-border: #4a1a1a;
+  --green: #3dcc7e; --green-bg: #0d2a1a; --green-border: #1a4a2a;
+  --purple: #a78bfa; --purple-bg: #1a1030; --purple-border: #3a2860;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-sans: 'IBM Plex Sans', sans-serif;
+}
+body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 14px; line-height: 1.6; min-height: 100vh; }
 
-  /* Sidebar */
-  .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 24px 0; display: flex; flex-direction: column; }
-  .logo { padding: 0 20px 24px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
-  .logo-mark { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--blue); letter-spacing: 0.05em; display: block; margin-bottom: 2px; }
-  .logo-sub { font-size: 11px; color: var(--muted); }
-  .nav-label { font-size: 10px; color: var(--hint); letter-spacing: 0.1em; text-transform: uppercase; padding: 0 20px; margin-bottom: 6px; }
-  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 20px; font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.15s; border-left: 2px solid transparent; }
-  .nav-item:hover { color: var(--text); background: var(--surface2); }
-  .nav-item.active { color: var(--text); border-left-color: var(--blue); background: var(--surface2); }
-  .nav-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .nav-count { margin-left: auto; font-family: var(--font-mono); font-size: 11px; background: var(--surface2); color: var(--muted); padding: 1px 7px; border-radius: 10px; }
-  .sidebar-footer { margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--hint); font-family: var(--font-mono); }
-  .repo-link { color: var(--blue); text-decoration: none; }
+/* ── ONBOARDING ── */
+.onboarding { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.ob-card { width: 100%; max-width: 520px; }
+.ob-logo { font-family: var(--font-mono); font-size: 12px; color: var(--blue); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 32px; }
+.ob-steps { display: flex; gap: 8px; margin-bottom: 32px; }
+.ob-step { flex: 1; height: 3px; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+.ob-step.done { background: var(--blue); }
+.ob-step.active { background: var(--blue); opacity: 0.5; }
+.ob-title { font-size: 22px; font-weight: 500; margin-bottom: 8px; }
+.ob-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+.ob-field { margin-bottom: 16px; }
+.ob-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.ob-input { width: 100%; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: var(--font-mono); font-size: 13px; outline: none; transition: border-color 0.15s; }
+.ob-input:focus { border-color: var(--blue); }
+.ob-input.valid { border-color: var(--green); }
+.ob-input.error { border-color: var(--red); }
+.ob-hint { font-size: 11px; color: var(--muted); margin-top: 5px; font-family: var(--font-mono); }
+.ob-hint.green { color: var(--green); }
+.ob-hint.red { color: var(--red); }
+.ob-actions { display: flex; gap: 10px; margin-top: 24px; }
+.ob-btn { flex: 1; padding: 12px; border-radius: 8px; font-size: 14px; font-family: var(--font-sans); cursor: pointer; transition: all 0.15s; border: none; font-weight: 400; }
+.ob-btn-primary { background: var(--blue); color: #fff; }
+.ob-btn-primary:hover { background: #6ab0ff; }
+.ob-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.ob-btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border2); }
+.ob-btn-ghost:hover { color: var(--text); }
+.ob-repo-preview { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-top: 12px; display: none; }
+.ob-repo-name { font-family: var(--font-mono); font-size: 13px; color: var(--blue); margin-bottom: 4px; }
+.ob-repo-desc { font-size: 12px; color: var(--muted); }
 
-  /* Main */
-  .main { padding: 32px 36px; overflow-y: auto; }
-  .topbar { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; gap: 16px; flex-wrap: wrap; }
-  .page-title { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
-  .page-sub { font-size: 13px; color: var(--muted); }
-  .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+/* ── APP LAYOUT ── */
+.app { display: none; }
+.layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 0; display: flex; flex-direction: column; }
+.sidebar-top { padding: 20px; border-bottom: 1px solid var(--border); }
+.app-logo { font-family: var(--font-mono); font-size: 12px; color: var(--blue); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 2px; }
+.app-tagline { font-size: 11px; color: var(--hint); }
 
-  .btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-family: var(--font-sans); cursor: pointer; transition: all 0.15s; font-weight: 400; border: none; }
-  .btn-primary { background: var(--blue); color: #fff; }
-  .btn-primary:hover { background: #6ab0ff; }
-  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border2); }
-  .btn-ghost:hover { color: var(--text); background: var(--surface2); }
-  .btn-sm { padding: 5px 12px; font-size: 12px; }
-  .btn-scan { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
-  .btn-scan:hover { background: var(--purple); color: #fff; }
-  .btn-scan:disabled { opacity: 0.5; cursor: not-allowed; }
+/* Repo switcher */
+.repo-switcher { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.repo-switcher-label { font-size: 10px; color: var(--hint); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.repo-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 6px; cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
+.repo-item:hover { background: var(--surface2); }
+.repo-item.active { background: var(--blue-bg); border: 1px solid var(--blue-border); }
+.repo-avatar { width: 20px; height: 20px; border-radius: 4px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--muted); flex-shrink: 0; font-family: var(--font-mono); font-weight: 500; }
+.repo-avatar.active { background: var(--blue-bg); color: var(--blue); }
+.repo-name { font-size: 12px; font-family: var(--font-mono); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.repo-item.active .repo-name { color: var(--blue); }
+.repo-issues-count { font-size: 10px; color: var(--hint); font-family: var(--font-mono); }
+.add-repo-btn { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 6px; cursor: pointer; color: var(--muted); font-size: 12px; transition: all 0.15s; margin-top: 4px; }
+.add-repo-btn:hover { background: var(--surface2); color: var(--text); }
 
-  /* Backend status pill */
-  .backend-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-family: var(--font-mono); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); cursor: pointer; }
-  .backend-pill.connected { border-color: var(--green-border); color: var(--green); background: var(--green-bg); }
-  .backend-pill.error { border-color: var(--red-border); color: var(--red); background: var(--red-bg); }
-  .pill-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-  .pill-dot.pulse { animation: pulse 1.2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+/* Nav */
+.nav-section { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.nav-label { font-size: 10px; color: var(--hint); letter-spacing: 0.1em; text-transform: uppercase; padding: 0 16px; margin-bottom: 4px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 7px 16px; font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.15s; border-left: 2px solid transparent; }
+.nav-item:hover { color: var(--text); background: var(--surface2); }
+.nav-item.active { color: var(--text); border-left-color: var(--blue); background: var(--surface2); }
+.nav-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.nav-count { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--hint); }
+.sidebar-footer { margin-top: auto; padding: 14px 16px; border-top: 1px solid var(--border); }
+.backend-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-family: var(--font-mono); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); cursor: pointer; width: 100%; }
+.backend-pill.connected { border-color: var(--green-border); color: var(--green); background: var(--green-bg); }
+.backend-pill.error { border-color: var(--red-border); color: var(--red); background: var(--red-bg); }
+.pill-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.pill-dot.pulse { animation: blink 1.2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  /* Stats */
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
-  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
-  .stat-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .stat-val { font-size: 26px; font-family: var(--font-mono); font-weight: 500; }
-  .stat-val.blue { color: var(--blue); } .stat-val.amber { color: var(--amber); }
-  .stat-val.red { color: var(--red); } .stat-val.green { color: var(--green); }
+/* Main */
+.main { padding: 28px 32px; overflow-y: auto; }
+.topbar { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
+.page-title { font-size: 20px; font-weight: 500; margin-bottom: 3px; }
+.page-sub { font-size: 13px; color: var(--muted); }
+.topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn { display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 6px; font-size: 13px; font-family: var(--font-sans); cursor: pointer; transition: all 0.15s; font-weight: 400; border: none; }
+.btn-primary { background: var(--blue); color: #fff; }
+.btn-primary:hover { background: #6ab0ff; }
+.btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border2); }
+.btn-ghost:hover { color: var(--text); background: var(--surface2); }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-scan { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+.btn-scan:hover { background: var(--purple); color: #fff; }
 
-  /* Tabs */
-  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
-  .tab { padding: 8px 18px; font-size: 13px; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
-  .tab:hover { color: var(--text); }
-  .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+/* Metrics */
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }
+.metric { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+.metric-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+.metric-val { font-size: 24px; font-family: var(--font-mono); font-weight: 500; }
+.metric-val.blue { color: var(--blue); } .metric-val.amber { color: var(--amber); }
+.metric-val.red { color: var(--red); } .metric-val.green { color: var(--green); }
+.metric-sub { font-size: 11px; color: var(--hint); margin-top: 3px; font-family: var(--font-mono); }
 
-  /* Filters */
-  .filters { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
-  .filter-pill { padding: 5px 14px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; font-family: var(--font-sans); }
-  .filter-pill:hover { border-color: var(--border2); color: var(--text); }
-  .filter-pill.active { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
-  .filter-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+/* Tabs */
+.tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.tab { padding: 8px 16px; font-size: 13px; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--blue); border-bottom-color: var(--blue); }
 
-  /* Issue cards */
-  .issues-list { display: flex; flex-direction: column; gap: 8px; }
-  .issue-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; transition: border-color 0.15s; animation: fadeIn 0.3s ease forwards; opacity: 0; }
-  .issue-card:hover { border-color: var(--border2); }
-  .issue-card.critical-border { border-left: 3px solid var(--red); }
-  .issue-card.high-border { border-left: 3px solid var(--amber); }
-  @keyframes fadeIn { to { opacity: 1; } }
-  .issue-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
-  .issue-num { font-family: var(--font-mono); font-size: 11px; color: var(--hint); white-space: nowrap; margin-top: 2px; }
-  .issue-title { font-size: 14px; font-weight: 500; flex: 1; line-height: 1.4; }
-  .issue-actions { display: flex; gap: 8px; flex-shrink: 0; }
-  .ai-summary { font-size: 12px; color: var(--purple); background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: 5px; padding: 6px 10px; margin: 6px 0 10px 36px; line-height: 1.5; font-family: var(--font-mono); }
-  .ai-summary-label { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
-  .issue-body { font-size: 12px; color: var(--muted); margin-bottom: 10px; line-height: 1.6; padding-left: 36px; }
-  .issue-footer { display: flex; align-items: center; gap: 8px; padding-left: 36px; flex-wrap: wrap; }
-  .badge { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono); font-weight: 500; white-space: nowrap; }
-  .badge-bug { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
-  .badge-codeql { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
-  .badge-critical { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
-  .badge-high { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
-  .badge-medium { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
-  .badge-low { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-  .badge-ai { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
-  .badge-default { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-  .issue-age { font-size: 11px; color: var(--hint); margin-left: auto; font-family: var(--font-mono); }
+/* Filters */
+.filters { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
+.filter-pill { padding: 4px 12px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; font-family: var(--font-sans); }
+.filter-pill:hover { border-color: var(--border2); color: var(--text); }
+.filter-pill.active { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
+.filter-sep { width: 1px; height: 18px; background: var(--border); }
 
-  /* Fix button */
-  .btn-fix { font-size: 11px; padding: 5px 12px; border-radius: 5px; border: 1px solid var(--blue-border); background: var(--blue-bg); color: var(--blue); cursor: pointer; font-family: var(--font-mono); transition: all 0.15s; white-space: nowrap; }
-  .btn-fix:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
-  .btn-fix:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-fix.running { border-color: var(--amber-border); background: var(--amber-bg); color: var(--amber); animation: pulse 1.5s infinite; }
-  .btn-fix.done { border-color: var(--green-border); background: var(--green-bg); color: var(--green); }
+/* Issue cards */
+.issues-list { display: flex; flex-direction: column; gap: 8px; }
+.issue-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; transition: border-color 0.15s; animation: fadeIn 0.25s ease forwards; opacity: 0; }
+.issue-card:hover { border-color: var(--border2); }
+.issue-card.critical-border { border-left: 3px solid var(--red); }
+.issue-card.high-border { border-left: 3px solid var(--amber); }
+@keyframes fadeIn { to { opacity: 1; } }
+.issue-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+.issue-num { font-family: var(--font-mono); font-size: 11px; color: var(--hint); white-space: nowrap; margin-top: 2px; }
+.issue-title { font-size: 14px; font-weight: 500; flex: 1; line-height: 1.4; }
+.issue-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.ai-summary { font-size: 12px; color: var(--purple); background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: 5px; padding: 6px 10px; margin: 6px 0 10px 32px; line-height: 1.5; font-family: var(--font-mono); }
+.ai-label { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
+.issue-body { font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.5; padding-left: 32px; }
+.issue-footer { display: flex; align-items: center; gap: 6px; padding-left: 32px; flex-wrap: wrap; }
+.badge { font-size: 10px; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-weight: 500; white-space: nowrap; }
+.badge-bug { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+.badge-codeql { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+.badge-critical { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+.badge-high { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+.badge-medium { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+.badge-low { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+.badge-ai { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+.badge-default { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+.issue-age { font-size: 11px; color: var(--hint); margin-left: auto; font-family: var(--font-mono); }
+.btn-fix { font-size: 11px; padding: 4px 10px; border-radius: 5px; border: 1px solid var(--blue-border); background: var(--blue-bg); color: var(--blue); cursor: pointer; font-family: var(--font-mono); transition: all 0.15s; white-space: nowrap; }
+.btn-fix:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+.btn-fix:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-fix.running { border-color: var(--amber-border); background: var(--amber-bg); color: var(--amber); animation: blink 1.5s infinite; }
+.btn-fix.done { border-color: var(--green-border); background: var(--green-bg); color: var(--green); }
 
-  /* Sessions tab */
-  .session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; animation: fadeIn 0.3s ease forwards; opacity: 0; }
-  .session-card:hover { border-color: var(--border2); }
-  .session-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .session-status.running { background: var(--amber); animation: pulse 1.2s infinite; }
-  .session-status.completed { background: var(--green); }
-  .session-status.blocked { background: var(--red); }
-  .session-status.stopped { background: var(--muted); }
-  .session-info { flex: 1; min-width: 0; }
-  .session-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .session-meta { font-size: 11px; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
-  .session-link { font-size: 11px; color: var(--blue); text-decoration: none; font-family: var(--font-mono); white-space: nowrap; }
-  .session-link:hover { text-decoration: underline; }
+/* PR cards */
+.pr-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; animation: fadeIn 0.25s ease forwards; opacity: 0; }
+.pr-card:hover { border-color: var(--border2); }
+.pr-state { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pr-state.open { background: var(--green); }
+.pr-state.merged { background: var(--purple); }
+.pr-state.closed { background: var(--muted); }
+.pr-info { flex: 1; min-width: 0; }
+.pr-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pr-meta { font-size: 11px; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
+.pr-link { font-size: 11px; color: var(--blue); text-decoration: none; font-family: var(--font-mono); white-space: nowrap; }
+.pr-link:hover { text-decoration: underline; }
 
-  /* Loading */
-  .loading { text-align: center; padding: 60px 20px; color: var(--muted); font-family: var(--font-mono); font-size: 13px; }
-  .spinner { width: 24px; height: 24px; border: 2px solid var(--border2); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* Session cards */
+.session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; animation: fadeIn 0.25s ease forwards; opacity: 0; }
+.session-card:hover { border-color: var(--border2); }
+.session-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.session-dot.running { background: var(--amber); animation: blink 1.2s infinite; }
+.session-dot.completed { background: var(--green); }
+.session-dot.blocked { background: var(--red); }
+.session-dot.stopped { background: var(--muted); }
+.session-info { flex: 1; min-width: 0; }
+.session-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.session-meta { font-size: 11px; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
 
-  /* Modal */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 10px; padding: 28px; width: 500px; max-width: 90vw; }
-  .modal h3 { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
-  .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
-  .config-row { margin-bottom: 14px; }
-  .config-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .config-input { width: 100%; padding: 8px 12px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-family: var(--font-mono); font-size: 12px; outline: none; }
-  .config-input:focus { border-color: var(--blue); }
-  textarea.config-input { height: 90px; resize: vertical; font-size: 11px; }
-  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+/* Loading */
+.loading { text-align: center; padding: 50px 20px; color: var(--muted); font-family: var(--font-mono); font-size: 13px; }
+.spinner { width: 22px; height: 22px; border: 2px solid var(--border2); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-  /* Toast */
-  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 12px 16px; font-size: 12px; color: var(--text); font-family: var(--font-mono); z-index: 200; transform: translateY(80px); opacity: 0; transition: all 0.3s; max-width: 380px; line-height: 1.5; }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.success { border-left: 3px solid var(--green); }
-  .toast.error { border-left: 3px solid var(--red); }
-  .toast.info { border-left: 3px solid var(--blue); }
-  .toast.purple { border-left: 3px solid var(--purple); }
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 10px; padding: 24px; width: 460px; max-width: 90vw; }
+.modal h3 { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+.modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 18px; }
+.modal-field { margin-bottom: 12px; }
+.modal-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+.modal-input { width: 100%; padding: 8px 12px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-family: var(--font-mono); font-size: 12px; outline: none; }
+.modal-input:focus { border-color: var(--blue); }
+textarea.modal-input { height: 80px; resize: vertical; font-size: 11px; }
+.modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+
+/* Toast */
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 12px 16px; font-size: 12px; color: var(--text); font-family: var(--font-mono); z-index: 200; transform: translateY(80px); opacity: 0; transition: all 0.3s; max-width: 380px; line-height: 1.5; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error { border-left: 3px solid var(--red); }
+.toast.info { border-left: 3px solid var(--blue); }
+.toast.purple { border-left: 3px solid var(--purple); }
 </style>
 </head>
 <body>
-<div class="layout">
-  <aside class="sidebar">
-    <div class="logo">
-      <span class="logo-mark">FINSECURE</span>
-      <span class="logo-sub">backlog resolver</span>
-    </div>
-    <div style="margin-bottom:16px">
-      <div class="nav-label">views</div>
-      <div class="nav-item active" onclick="setView('all',this)"><span class="nav-dot" style="background:var(--muted)"></span>all items<span class="nav-count" id="cnt-all">—</span></div>
-      <div class="nav-item" onclick="setView('bug',this)"><span class="nav-dot" style="background:var(--amber)"></span>bugs<span class="nav-count" id="cnt-bug">—</span></div>
-      <div class="nav-item" onclick="setView('security',this)"><span class="nav-dot" style="background:var(--red)"></span>security<span class="nav-count" id="cnt-sec">—</span></div>
-      <div class="nav-item" onclick="setView('critical',this)"><span class="nav-dot" style="background:var(--red)"></span>critical<span class="nav-count" id="cnt-crit">—</span></div>
-    </div>
-    <div>
-      <div class="nav-label">settings</div>
-      <div class="nav-item" onclick="openConfig()"><span class="nav-dot" style="background:var(--blue)"></span>configure backend</div>
-      <div class="nav-item" onclick="clearData()"><span class="nav-dot" style="background:var(--hint)"></span>clear local data</div>
-    </div>
-    <div class="sidebar-footer">
-      <div style="margin-bottom:4px">repo</div>
-      <a class="repo-link" href="https://github.com/febuniac/finsecure-api" target="_blank">febuniac/finsecure-api</a>
-    </div>
-  </aside>
 
-  <main class="main">
-    <div class="topbar">
-      <div>
-        <div class="page-title">open backlog</div>
-        <div class="page-sub" id="scan-time">loading...</div>
+<!-- ── ONBOARDING ── -->
+<div class="onboarding" id="onboarding">
+  <div class="ob-card">
+    <div class="ob-logo">✦ backlog resolver</div>
+    <div class="ob-steps">
+      <div class="ob-step active" id="step-bar-1"></div>
+      <div class="ob-step" id="step-bar-2"></div>
+      <div class="ob-step" id="step-bar-3"></div>
+    </div>
+
+    <!-- Step 1: GitHub repo -->
+    <div id="ob-step-1">
+      <div class="ob-title">Connect your GitHub repo</div>
+      <div class="ob-sub">Paste any GitHub repository URL and we'll detect your open issues, security alerts, and pull requests automatically.</div>
+      <div class="ob-field">
+        <div class="ob-label">GitHub repository URL</div>
+        <input class="ob-input" id="ob-repo-url" type="text" placeholder="https://github.com/your-org/your-repo" oninput="detectRepo(this.value)">
+        <div class="ob-hint" id="ob-repo-hint"></div>
       </div>
-      <div class="topbar-actions">
-        <div class="backend-pill" id="backend-pill" onclick="openConfig()">
-          <span class="pill-dot pulse"></span>
-          <span id="backend-status-text">not connected</span>
-        </div>
-        <button class="btn btn-ghost btn-sm" onclick="loadIssues()">↻ refresh</button>
-        <button class="btn btn-scan btn-sm" id="btn-scan" onclick="runDevinScan()">✦ scan with devin</button>
+      <div class="ob-repo-preview" id="ob-repo-preview">
+        <div class="ob-repo-name" id="ob-repo-name"></div>
+        <div class="ob-repo-desc" id="ob-repo-desc"></div>
+      </div>
+      <div class="ob-actions">
+        <button class="ob-btn ob-btn-primary" id="ob-step1-next" onclick="goStep(2)" disabled>Continue →</button>
       </div>
     </div>
 
-    <div class="stats">
-      <div class="stat"><div class="stat-label">total open</div><div class="stat-val blue" id="s-total">—</div></div>
-      <div class="stat"><div class="stat-label">bugs</div><div class="stat-val amber" id="s-bugs">—</div></div>
-      <div class="stat"><div class="stat-label">security</div><div class="stat-val red" id="s-sec">—</div></div>
-      <div class="stat"><div class="stat-label">sent to devin</div><div class="stat-val green" id="s-devin">0</div></div>
-    </div>
-
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab('issues',this)">issues</div>
-      <div class="tab" onclick="switchTab('sessions',this)">devin sessions <span id="sessions-count" style="font-size:10px;color:var(--muted);font-family:var(--font-mono);margin-left:4px"></span></div>
-    </div>
-
-    <!-- Issues tab -->
-    <div id="tab-issues">
-      <div class="filters">
-        <button class="filter-pill active" onclick="filterIssues('all',this)">all</button>
-        <button class="filter-pill" onclick="filterIssues('bug',this)">bugs</button>
-        <button class="filter-pill" onclick="filterIssues('security',this)">security</button>
-        <button class="filter-pill" onclick="filterIssues('codeql',this)">codeql</button>
-        <div class="filter-sep"></div>
-        <button class="filter-pill" onclick="filterIssues('critical',this)">critical</button>
-        <button class="filter-pill" onclick="filterIssues('high',this)">high</button>
-        <button class="filter-pill" onclick="filterIssues('ai',this)">✦ ai classified</button>
+    <!-- Step 2: Devin config -->
+    <div id="ob-step-2" style="display:none">
+      <div class="ob-title">Connect Devin</div>
+      <div class="ob-sub">Add your Devin API credentials. These stay in your browser only — we never send them anywhere else.</div>
+      <div class="ob-field">
+        <div class="ob-label">Backend URL</div>
+        <input class="ob-input" id="ob-backend" type="text" placeholder="https://your-backend.railway.app">
+        <div class="ob-hint">Your Railway or Replit backend URL</div>
       </div>
-      <div class="issues-list" id="issues-list">
-        <div class="loading"><div class="spinner"></div>loading issues...</div>
+      <div class="ob-field">
+        <div class="ob-label">Notification email (optional)</div>
+        <input class="ob-input" id="ob-email" type="email" placeholder="team@yourcompany.com">
+        <div class="ob-hint">Get notified when Devin opens a PR or needs input</div>
+      </div>
+      <div class="ob-actions">
+        <button class="ob-btn ob-btn-ghost" onclick="goStep(1)">← Back</button>
+        <button class="ob-btn ob-btn-primary" onclick="goStep(3)">Continue →</button>
       </div>
     </div>
 
-    <!-- Sessions tab -->
-    <div id="tab-sessions" style="display:none">
-      <div id="sessions-list">
-        <div class="loading"><div class="spinner"></div>loading sessions...</div>
+    <!-- Step 3: Done -->
+    <div id="ob-step-3" style="display:none">
+      <div class="ob-title">You're all set 🎉</div>
+      <div class="ob-sub">Your repo is connected and Devin is ready. You can add more repos anytime from the sidebar.</div>
+      <div class="ob-repo-preview" style="display:block;margin-bottom:20px">
+        <div class="ob-repo-name" id="ob-confirm-repo"></div>
+        <div class="ob-repo-desc" id="ob-confirm-desc"></div>
+      </div>
+      <div class="ob-actions">
+        <button class="ob-btn ob-btn-primary" onclick="launchApp()">Open dashboard →</button>
       </div>
     </div>
-  </main>
+  </div>
 </div>
 
-<!-- Config modal -->
-<div class="modal-overlay" id="config-modal">
+<!-- ── APP ── -->
+<div class="app" id="app">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="app-logo">✦ backlog resolver</div>
+        <div class="app-tagline">powered by devin</div>
+      </div>
+
+      <div class="repo-switcher">
+        <div class="repo-switcher-label">repositories</div>
+        <div id="repo-list"></div>
+        <div class="add-repo-btn" onclick="showAddRepo()">
+          <span style="font-size:16px;line-height:1">+</span>
+          <span>add repository</span>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">views</div>
+        <div class="nav-item active" onclick="setView('all',this)"><span class="nav-dot" style="background:var(--muted)"></span>all issues<span class="nav-count" id="cnt-all">—</span></div>
+        <div class="nav-item" onclick="setView('bug',this)"><span class="nav-dot" style="background:var(--amber)"></span>bugs<span class="nav-count" id="cnt-bug">—</span></div>
+        <div class="nav-item" onclick="setView('security',this)"><span class="nav-dot" style="background:var(--red)"></span>security<span class="nav-count" id="cnt-sec">—</span></div>
+        <div class="nav-item" onclick="setView('critical',this)"><span class="nav-dot" style="background:var(--red)"></span>critical<span class="nav-count" id="cnt-crit">—</span></div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="backend-pill" id="backend-pill" onclick="openSettings()">
+          <span class="pill-dot pulse" id="pill-dot"></span>
+          <span id="pill-text">not connected</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <div class="page-title" id="page-title">open backlog</div>
+          <div class="page-sub" id="page-sub">loading...</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-sm" onclick="loadCurrentRepo()">↻ refresh</button>
+          <button class="btn btn-scan btn-sm" onclick="runDevinScan()">✦ scan with devin</button>
+          <button class="btn btn-ghost btn-sm" onclick="openSettings()">settings</button>
+        </div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">open issues</div><div class="metric-val blue" id="m-issues">—</div><div class="metric-sub" id="m-issues-sub"></div></div>
+        <div class="metric"><div class="metric-label">security</div><div class="metric-val red" id="m-sec">—</div><div class="metric-sub" id="m-sec-sub"></div></div>
+        <div class="metric"><div class="metric-label">open PRs</div><div class="metric-val amber" id="m-prs">—</div><div class="metric-sub" id="m-prs-sub"></div></div>
+        <div class="metric"><div class="metric-label">sent to devin</div><div class="metric-val green" id="m-devin">0</div><div class="metric-sub" id="m-devin-sub"></div></div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('issues',this)">issues</div>
+        <div class="tab" onclick="switchTab('prs',this)">pull requests <span id="pr-count" style="font-size:10px;color:var(--muted);font-family:var(--font-mono);margin-left:4px"></span></div>
+        <div class="tab" onclick="switchTab('sessions',this)">devin sessions <span id="sess-count" style="font-size:10px;color:var(--muted);font-family:var(--font-mono);margin-left:4px"></span></div>
+      </div>
+
+      <div id="tab-issues">
+        <div class="filters">
+          <button class="filter-pill active" onclick="filterIssues('all',this)">all</button>
+          <button class="filter-pill" onclick="filterIssues('bug',this)">bugs</button>
+          <button class="filter-pill" onclick="filterIssues('security',this)">security</button>
+          <button class="filter-pill" onclick="filterIssues('codeql',this)">codeql</button>
+          <div class="filter-sep"></div>
+          <button class="filter-pill" onclick="filterIssues('critical',this)">critical</button>
+          <button class="filter-pill" onclick="filterIssues('high',this)">high</button>
+          <button class="filter-pill" onclick="filterIssues('ai',this)">✦ ai classified</button>
+        </div>
+        <div class="issues-list" id="issues-list"><div class="loading"><div class="spinner"></div>loading...</div></div>
+      </div>
+
+      <div id="tab-prs" style="display:none">
+        <div id="prs-list"><div class="loading"><div class="spinner"></div>loading...</div></div>
+      </div>
+
+      <div id="tab-sessions" style="display:none">
+        <div id="sessions-list"><div class="loading"><div class="spinner"></div>loading...</div></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Add repo modal -->
+<div class="modal-overlay" id="add-repo-modal">
   <div class="modal">
-    <h3>configure backend</h3>
-    <div class="modal-sub">
-      Paste your Replit backend URL below. All Devin API calls go through it — no credentials exposed in the browser.
-    </div>
-    <div class="config-row">
-      <div class="config-label">backend url</div>
-      <input class="config-input" type="text" id="cfg-backend" placeholder="https://your-replit.replit.app">
-    </div>
-    <div class="config-row">
-      <div class="config-label">github repo</div>
-      <input class="config-input" type="text" id="cfg-repo" value="febuniac/finsecure-api">
-    </div>
-    <div class="config-row">
-      <div class="config-label">paste devin classification json (optional)</div>
-      <textarea class="config-input" id="cfg-json" placeholder='{"1": {"type": "security", "criticality": "critical", "summary": "..."}, ...}'></textarea>
+    <h3>add repository</h3>
+    <div class="modal-sub">Paste a GitHub URL to connect another repo.</div>
+    <div class="modal-field">
+      <div class="modal-label">GitHub URL</div>
+      <input class="modal-input" id="add-repo-url" type="text" placeholder="https://github.com/org/repo" oninput="detectAddRepo(this.value)">
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;font-family:var(--font-mono)" id="add-repo-hint"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" onclick="closeConfig()">cancel</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('add-repo-modal')">cancel</button>
+      <button class="btn btn-primary btn-sm" id="add-repo-confirm" onclick="confirmAddRepo()" disabled>add repo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <h3>settings</h3>
+    <div class="modal-sub">Backend and notification configuration.</div>
+    <div class="modal-field">
+      <div class="modal-label">backend URL</div>
+      <input class="modal-input" id="s-backend" type="text" placeholder="https://your-backend.railway.app">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">paste devin classification JSON</div>
+      <textarea class="modal-input" id="s-json" placeholder='{"1": {"type": "security", "criticality": "critical", "summary": "..."}}'></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('settings-modal')">cancel</button>
       <button class="btn btn-scan btn-sm" onclick="applyClassifications()">apply classifications</button>
-      <button class="btn btn-primary btn-sm" onclick="saveConfig()">save & test</button>
+      <button class="btn btn-primary btn-sm" onclick="saveSettings()">save & test</button>
     </div>
   </div>
 </div>
@@ -265,21 +400,188 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const REPO = 'febuniac/finsecure-api';
-let allIssues = [];
+// ── STATE ──
+let repos = JSON.parse(localStorage.getItem('repos') || '[]');
+let currentRepo = localStorage.getItem('current_repo') || '';
 let aiCls = JSON.parse(localStorage.getItem('ai_cls') || '{}');
-let currentFilter = 'all';
-let currentView = 'all';
-let currentTab = 'issues';
-let devinCount = parseInt(localStorage.getItem('devin_count') || '0');
+let allIssues = [], allPRs = [];
+let currentFilter = 'all', currentView = 'all', currentTab = 'issues';
 let backendOk = false;
-let config = {
-  backend: localStorage.getItem('backend_url') || '',
-  repo: localStorage.getItem('cfg_repo') || REPO
-};
+let devinCount = parseInt(localStorage.getItem('devin_count') || '0');
+let pendingRepo = null, pendingAddRepo = null;
+let config = { backend: localStorage.getItem('backend_url') || '' };
 
-document.getElementById('s-devin').textContent = devinCount;
+document.getElementById('m-devin').textContent = devinCount;
 
+// ── ONBOARDING ──
+let obRepo = null;
+let obStep = 1;
+
+function goStep(n) {
+  document.getElementById(`ob-step-${obStep}`).style.display = 'none';
+  document.getElementById(`ob-step-${n}`).style.display = '';
+  document.getElementById(`step-bar-${obStep}`).classList.remove('active');
+  document.getElementById(`step-bar-${obStep}`).classList.add('done');
+  document.getElementById(`step-bar-${n}`).classList.add('active');
+  obStep = n;
+  if (n === 3) {
+    document.getElementById('ob-confirm-repo').textContent = obRepo.full_name;
+    document.getElementById('ob-confirm-desc').textContent = obRepo.description || 'No description';
+  }
+}
+
+async function detectRepo(url) {
+  const hint = document.getElementById('ob-repo-hint');
+  const preview = document.getElementById('ob-repo-preview');
+  const btn = document.getElementById('ob-step1-next');
+  const parsed = parseGitHubUrl(url);
+  if (!parsed) {
+    hint.textContent = parsed === null ? '' : 'paste a valid github.com URL';
+    hint.className = 'ob-hint';
+    preview.style.display = 'none';
+    btn.disabled = true;
+    return;
+  }
+  hint.textContent = 'checking...';
+  hint.className = 'ob-hint';
+  try {
+    const res = await fetch(`https://api.github.com/repos/${parsed}`);
+    if (!res.ok) throw new Error('repo not found');
+    const data = await res.json();
+    obRepo = data;
+    document.getElementById('ob-repo-name').textContent = data.full_name;
+    document.getElementById('ob-repo-desc').textContent = data.description || 'No description · ' + (data.open_issues_count || 0) + ' open issues';
+    preview.style.display = 'block';
+    hint.textContent = `✓ found — ${data.open_issues_count} open issues`;
+    hint.className = 'ob-hint green';
+    btn.disabled = false;
+  } catch(e) {
+    hint.textContent = 'could not find this repo — check the URL';
+    hint.className = 'ob-hint red';
+    preview.style.display = 'none';
+    btn.disabled = true;
+  }
+}
+
+function launchApp() {
+  if (!obRepo) return;
+  const backend = document.getElementById('ob-backend').value.trim().replace(/\/$/, '');
+  if (backend) {
+    config.backend = backend;
+    localStorage.setItem('backend_url', backend);
+  }
+  addRepo(obRepo.full_name, obRepo.description || '');
+  document.getElementById('onboarding').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  initApp();
+}
+
+// ── REPO MANAGEMENT ──
+function parseGitHubUrl(url) {
+  if (!url) return null;
+  const m = url.match(/github\.com\/([^\/]+\/[^\/\s?#]+)/);
+  return m ? m[1].replace(/\.git$/, '') : false;
+}
+
+function addRepo(fullName, desc = '') {
+  if (repos.find(r => r.full_name === fullName)) return;
+  repos.push({ full_name: fullName, desc });
+  localStorage.setItem('repos', JSON.stringify(repos));
+  currentRepo = fullName;
+  localStorage.setItem('current_repo', currentRepo);
+  renderRepoList();
+}
+
+function switchRepo(fullName) {
+  currentRepo = fullName;
+  localStorage.setItem('current_repo', fullName);
+  aiCls = JSON.parse(localStorage.getItem(`ai_cls_${fullName}`) || '{}');
+  renderRepoList();
+  loadCurrentRepo();
+}
+
+function renderRepoList() {
+  const list = document.getElementById('repo-list');
+  list.innerHTML = repos.map(r => {
+    const initials = r.full_name.split('/')[1]?.substring(0, 2).toUpperCase() || '??';
+    const isActive = r.full_name === currentRepo;
+    return `<div class="repo-item ${isActive ? 'active' : ''}" onclick="switchRepo('${r.full_name}')">
+      <div class="repo-avatar ${isActive ? 'active' : ''}">${initials}</div>
+      <span class="repo-name">${r.full_name.split('/')[1]}</span>
+    </div>`;
+  }).join('');
+}
+
+async function detectAddRepo(url) {
+  const hint = document.getElementById('add-repo-hint');
+  const btn = document.getElementById('add-repo-confirm');
+  const parsed = parseGitHubUrl(url);
+  if (!parsed) { hint.textContent = ''; btn.disabled = true; pendingAddRepo = null; return; }
+  hint.textContent = 'checking...';
+  try {
+    const res = await fetch(`https://api.github.com/repos/${parsed}`);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    pendingAddRepo = data;
+    hint.textContent = `✓ ${data.full_name} — ${data.open_issues_count} open issues`;
+    hint.style.color = 'var(--green)';
+    btn.disabled = false;
+  } catch {
+    hint.textContent = 'repo not found';
+    hint.style.color = 'var(--red)';
+    btn.disabled = true;
+  }
+}
+
+function confirmAddRepo() {
+  if (!pendingAddRepo) return;
+  addRepo(pendingAddRepo.full_name, pendingAddRepo.description || '');
+  closeModal('add-repo-modal');
+  switchRepo(pendingAddRepo.full_name);
+  showToast(`${pendingAddRepo.full_name} connected ✓`, 'success');
+}
+
+function showAddRepo() {
+  document.getElementById('add-repo-url').value = '';
+  document.getElementById('add-repo-hint').textContent = '';
+  document.getElementById('add-repo-confirm').disabled = true;
+  pendingAddRepo = null;
+  document.getElementById('add-repo-modal').classList.add('open');
+}
+
+// ── APP INIT ──
+function initApp() {
+  renderRepoList();
+  checkBackend();
+  loadCurrentRepo();
+}
+
+async function checkBackend() {
+  if (!config.backend) return;
+  try {
+    const res = await fetch(`${config.backend}/health`, { signal: AbortSignal.timeout(5000) });
+    if (res.ok) {
+      backendOk = true;
+      const pill = document.getElementById('backend-pill');
+      pill.className = 'backend-pill connected';
+      document.getElementById('pill-dot').classList.remove('pulse');
+      document.getElementById('pill-text').textContent = 'backend connected';
+    } else throw new Error();
+  } catch {
+    backendOk = false;
+    document.getElementById('backend-pill').className = 'backend-pill error';
+    document.getElementById('pill-text').textContent = 'backend error';
+  }
+}
+
+async function loadCurrentRepo() {
+  if (!currentRepo) return;
+  document.getElementById('page-title').textContent = currentRepo.split('/')[1];
+  document.getElementById('page-sub').textContent = `loading ${currentRepo}...`;
+  await Promise.all([loadIssues(), loadPRs()]);
+}
+
+// ── ISSUES ──
 const isSec = (i,c) => i.labels.some(l => ['security','codeql'].includes(l.name.toLowerCase())) || (c && c.type === 'security');
 const isBug = (i,c) => i.labels.some(l => l.name.toLowerCase() === 'bug') || (c && c.type === 'bug');
 const getCrit = (i,c) => {
@@ -306,48 +608,94 @@ const badgeCls = l => {
   return 'badge-default';
 };
 
-async function checkBackend() {
-  if (!config.backend) return;
+async function loadIssues() {
+  const list = document.getElementById('issues-list');
+  list.innerHTML = '<div class="loading"><div class="spinner"></div>fetching issues...</div>';
   try {
-    const res = await fetch(`${config.backend}/health`, { signal: AbortSignal.timeout(5000) });
-    if (res.ok) {
-      backendOk = true;
-      const pill = document.getElementById('backend-pill');
-      pill.className = 'backend-pill connected';
-      pill.querySelector('.pill-dot').classList.remove('pulse');
-      document.getElementById('backend-status-text').textContent = 'backend connected';
-    } else throw new Error();
-  } catch {
-    backendOk = false;
-    const pill = document.getElementById('backend-pill');
-    pill.className = 'backend-pill error';
-    document.getElementById('backend-status-text').textContent = 'backend error';
+    const res = await fetch(`https://api.github.com/repos/${currentRepo}/issues?state=open&per_page=50`);
+    if (!res.ok) throw new Error('GitHub API ' + res.status);
+    const all = await res.json();
+    allIssues = all.filter(i => !i.pull_request);
+    updateMetrics();
+    list.innerHTML = allIssues.length
+      ? allIssues.map((i, idx) => renderIssue(i, idx * 40)).join('')
+      : '<div class="loading">no open issues</div>';
+    applyFilter();
+    document.getElementById('page-sub').textContent = `${allIssues.length} open issues · ${currentRepo}`;
+  } catch(err) {
+    list.innerHTML = `<div class="loading" style="color:var(--red)">${err.message}</div>`;
   }
+}
+
+async function loadPRs() {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${currentRepo}/pulls?state=open&per_page=30`);
+    if (!res.ok) return;
+    allPRs = await res.json();
+    document.getElementById('pr-count').textContent = `(${allPRs.length})`;
+    document.getElementById('m-prs').textContent = allPRs.length;
+    document.getElementById('m-prs-sub').textContent = 'open for review';
+    if (currentTab === 'prs') renderPRs();
+  } catch {}
+}
+
+function renderPRs() {
+  const list = document.getElementById('prs-list');
+  if (!allPRs.length) { list.innerHTML = '<div class="loading">no open PRs</div>'; return; }
+  list.innerHTML = allPRs.map((pr, i) => `
+    <div class="pr-card" style="animation-delay:${i*40}ms">
+      <div class="pr-state open"></div>
+      <div class="pr-info">
+        <div class="pr-title">#${pr.number} ${pr.title}</div>
+        <div class="pr-meta">${pr.user.login} · opened ${timeAgo(pr.created_at)}</div>
+      </div>
+      <a href="${pr.html_url}" target="_blank" class="pr-link">review →</a>
+    </div>`).join('');
+}
+
+function updateMetrics() {
+  const sec = allIssues.filter(i => isSec(i, aiCls[i.number])).length;
+  const crit = allIssues.filter(i => getCrit(i, aiCls[i.number]) === 'critical').length;
+  document.getElementById('m-issues').textContent = allIssues.length;
+  document.getElementById('m-issues-sub').textContent = `${crit} critical`;
+  document.getElementById('m-sec').textContent = sec;
+  document.getElementById('m-sec-sub').textContent = 'need attention';
+  document.getElementById('cnt-all').textContent = allIssues.length;
+  document.getElementById('cnt-bug').textContent = allIssues.filter(i => isBug(i, aiCls[i.number])).length;
+  document.getElementById('cnt-sec').textContent = sec;
+  document.getElementById('cnt-crit').textContent = crit;
 }
 
 function renderIssue(issue, delay) {
   const c = aiCls[issue.number];
   const crit = getCrit(issue, c);
-  const done = localStorage.getItem(`dsess_${issue.number}`) === 'done';
+  const done = localStorage.getItem(`dsess_${currentRepo}_${issue.number}`);
   const border = crit === 'critical' ? 'critical-border' : crit === 'high' ? 'high-border' : '';
   const labels = issue.labels.map(l => `<span class="badge ${badgeCls(l.name)}">${l.name}</span>`).join('');
   const aiType = c && !issue.labels.some(l => ['bug','security'].includes(l.name.toLowerCase())) ? `<span class="badge badge-ai">✦ ${c.type}</span>` : '';
   const aiCritBadge = c && crit && !issue.labels.some(l => l.name.toLowerCase().includes(crit)) ? `<span class="badge badge-${crit}">${crit}</span>` : '';
-  const aiSummary = c && c.summary ? `<div class="ai-summary"><div class="ai-summary-label">✦ devin analysis</div>${c.summary}</div>` : '';
-  const body = issue.body ? issue.body.replace(/##\s*/g,'').replace(/```[\s\S]*?```/g,'[code]').substring(0,130).trim() + '...' : '';
+  const aiSummary = c?.summary ? `<div class="ai-summary"><div class="ai-label">✦ devin analysis</div>${c.summary}</div>` : '';
+  const body = issue.body ? issue.body.replace(/##\s*/g,'').replace(/```[\s\S]*?```/g,'[code]').substring(0,120).trim() + '...' : '';
   const typeKey = c ? c.type : isSec(issue,c) ? 'security' : isBug(issue,c) ? 'bug' : 'other';
 
-  return `<div class="issue-card ${border}" data-num="${issue.number}" data-type="${typeKey}" data-crit="${crit||''}" data-ai="${!!c}" style="animation-delay:${delay}ms">
+  let btnHtml = '';
+  if (done === 'pr_opened') {
+    btnHtml = `<button class="btn-fix done" disabled>PR opened ✓</button>`;
+  } else if (done && done !== 'done') {
+    btnHtml = `<button class="btn-fix running" id="btn-${issue.number}" onclick="sendToDevin(${issue.number},\`${issue.title.replace(/`/g,"'")}\`,\`${body.replace(/`/g,"'")}\`)">devin working...</button>`;
+  } else if (done === 'done') {
+    btnHtml = `<button class="btn-fix done" disabled>sent ✓</button>`;
+  } else {
+    btnHtml = `<button class="btn-fix" id="btn-${issue.number}" onclick="sendToDevin(${issue.number},\`${issue.title.replace(/`/g,"'")}\`,\`${body.replace(/`/g,"'")}\`)">fix with devin</button>`;
+  }
+
+  return `<div class="issue-card ${border}" data-type="${typeKey}" data-crit="${crit||''}" data-ai="${!!c}" style="animation-delay:${delay}ms">
     <div class="issue-top">
       <span class="issue-num">#${issue.number}</span>
       <span class="issue-title">${issue.title}</span>
       <div class="issue-actions">
-        <a href="${issue.html_url}" target="_blank" style="font-size:11px;color:var(--muted);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:5px;font-family:var(--font-mono)">view</a>
-        <button class="btn-fix ${done?'done':''}" id="btn-${issue.number}"
-          onclick="sendToDevin(${issue.number},\`${issue.title.replace(/`/g,"'")}\`,\`${body.replace(/`/g,"'")}\`)"
-          ${done?'disabled':''}>
-          ${done ? 'sent ✓' : 'fix with devin'}
-        </button>
+        <a href="${issue.html_url}" target="_blank" style="font-size:11px;color:var(--muted);text-decoration:none;padding:4px 9px;border:1px solid var(--border);border-radius:4px;font-family:var(--font-mono)">view</a>
+        ${btnHtml}
       </div>
     </div>
     ${aiSummary}
@@ -358,19 +706,6 @@ function renderIssue(issue, delay) {
       <span class="issue-age">${timeAgo(issue.created_at)}</span>
     </div>
   </div>`;
-}
-
-function updateStats() {
-  const bugs = allIssues.filter(i => isBug(i, aiCls[i.number])).length;
-  const sec = allIssues.filter(i => isSec(i, aiCls[i.number])).length;
-  const crit = allIssues.filter(i => getCrit(i, aiCls[i.number]) === 'critical').length;
-  document.getElementById('s-total').textContent = allIssues.length;
-  document.getElementById('s-bugs').textContent = bugs;
-  document.getElementById('s-sec').textContent = sec;
-  document.getElementById('cnt-all').textContent = allIssues.length;
-  document.getElementById('cnt-bug').textContent = bugs;
-  document.getElementById('cnt-sec').textContent = sec;
-  document.getElementById('cnt-crit').textContent = crit;
 }
 
 function applyFilter() {
@@ -409,66 +744,18 @@ function switchTab(tab, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('tab-issues').style.display = tab === 'issues' ? '' : 'none';
+  document.getElementById('tab-prs').style.display = tab === 'prs' ? '' : 'none';
   document.getElementById('tab-sessions').style.display = tab === 'sessions' ? '' : 'none';
+  if (tab === 'prs') renderPRs();
   if (tab === 'sessions') loadSessions();
 }
 
-async function loadIssues() {
-  const list = document.getElementById('issues-list');
-  list.innerHTML = '<div class="loading"><div class="spinner"></div>fetching from github...</div>';
-  try {
-    const res = await fetch(`https://api.github.com/repos/${config.repo}/issues?state=open&per_page=30`);
-    if (!res.ok) throw new Error('GitHub API error: ' + res.status);
-    allIssues = await res.json();
-    updateStats();
-    document.getElementById('scan-time').textContent = `${allIssues.length} open issues · synced just now`;
-    list.innerHTML = allIssues.length
-      ? allIssues.map((issue, i) => renderIssue(issue, i * 50)).join('')
-      : '<div class="loading">no open issues found.</div>';
-    applyFilter();
-  } catch(err) {
-    list.innerHTML = `<div class="loading" style="color:var(--red)">failed to load.<br><small>${err.message}</small></div>`;
-  }
-}
-
-async function loadSessions() {
-  const list = document.getElementById('sessions-list');
-  if (!backendOk) {
-    list.innerHTML = '<div class="loading" style="color:var(--amber)">connect your backend first — click "not connected" above</div>';
-    return;
-  }
-  list.innerHTML = '<div class="loading"><div class="spinner"></div>loading sessions...</div>';
-  try {
-    const res = await fetch(`${config.backend}/sessions`);
-    const data = await res.json();
-    const sessions = data.sessions || data.items || data || [];
-    document.getElementById('sessions-count').textContent = `(${sessions.length})`;
-    if (!sessions.length) { list.innerHTML = '<div class="loading">no sessions yet — fix an issue to create one.</div>'; return; }
-    list.innerHTML = sessions.map((s, i) => {
-      const status = s.status || s.state || 'unknown';
-      const title = s.title || s.prompt?.substring(0, 80) || `session ${s.session_id || s.id}`;
-      const sid = s.session_id || s.id || '';
-      const url = s.url || (sid ? `https://app.devin.ai/sessions/${sid}` : '#');
-      return `<div class="session-card" style="animation-delay:${i*40}ms">
-        <div class="session-status ${status}"></div>
-        <div class="session-info">
-          <div class="session-title">${title}</div>
-          <div class="session-meta">${sid ? sid.substring(0,16)+'...' : ''} · ${status}</div>
-        </div>
-        <a href="${url}" target="_blank" class="session-link">open in devin →</a>
-      </div>`;
-    }).join('');
-  } catch(err) {
-    list.innerHTML = `<div class="loading" style="color:var(--red)">failed to load sessions.<br><small>${err.message}</small></div>`;
-  }
-}
-
+// ── DEVIN ──
 async function sendToDevin(num, title, body) {
   const btn = document.getElementById(`btn-${num}`);
   const c = aiCls[num];
   const ctx = c ? `Type: ${c.type} | Criticality: ${c.criticality}\nAnalysis: ${c.summary}\n\n` : '';
-
-  const prompt = `You are fixing a bug in the FinSecure API (https://github.com/${config.repo}).
+  const prompt = `You are fixing a bug in the repository https://github.com/${currentRepo}.
 
 Issue #${num}: ${title}
 ${ctx}Context: ${body}
@@ -482,9 +769,7 @@ Please:
 
 Stay focused on this issue only.`;
 
-  btn.textContent = 'sending...';
-  btn.className = 'btn-fix running';
-  btn.disabled = true;
+  if (btn) { btn.textContent = 'sending...'; btn.className = 'btn-fix running'; btn.disabled = true; }
 
   if (backendOk) {
     try {
@@ -496,117 +781,35 @@ Stay focused on this issue only.`;
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || res.status);
       const sid = data.session_id || data.id;
-      const url = data.session_url || data.url || (sid ? `https://app.devin.ai/sessions/${sid}` : 'https://app.devin.ai');
-      localStorage.setItem(`dsess_${num}`, sid || 'done');
+      const url = data.session_url || data.url || `https://app.devin.ai/sessions/${sid}`;
+      localStorage.setItem(`dsess_${currentRepo}_${num}`, sid || 'done');
       devinCount++;
       localStorage.setItem('devin_count', devinCount);
-      document.getElementById('s-devin').textContent = devinCount;
-      btn.textContent = 'devin working...';
-      btn.className = 'btn-fix running';
+      document.getElementById('m-devin').textContent = devinCount;
       showToast(`session started → <a href="${url}" target="_blank" style="color:var(--blue)">watch devin →</a>`, 'success');
       if (sid) startPolling(num, sid);
     } catch(err) {
-      btn.textContent = 'fix with devin';
-      btn.className = 'btn-fix';
-      btn.disabled = false;
+      if (btn) { btn.textContent = 'fix with devin'; btn.className = 'btn-fix'; btn.disabled = false; }
       showToast('error: ' + err.message, 'error');
     }
   } else {
     setTimeout(() => {
-      btn.textContent = 'sent ✓';
-      btn.className = 'btn-fix done';
-      localStorage.setItem(`dsess_${num}`, 'done');
+      if (btn) { btn.textContent = 'sent ✓'; btn.className = 'btn-fix done'; btn.disabled = true; }
+      localStorage.setItem(`dsess_${currentRepo}_${num}`, 'done');
       devinCount++;
       localStorage.setItem('devin_count', devinCount);
-      document.getElementById('s-devin').textContent = devinCount;
+      document.getElementById('m-devin').textContent = devinCount;
     }, 800);
-    showToast('backend not connected — opening devin directly', 'info');
+    showToast('opening devin directly (backend not connected)', 'info');
     setTimeout(() => window.open(`https://app.devin.ai/?prompt=${encodeURIComponent(prompt)}`, '_blank'), 300);
   }
 }
 
-async function runDevinScan() {
-  const btn = document.getElementById('btn-scan');
-  btn.disabled = true;
-  btn.textContent = '✦ scanning...';
-
-  const issueList = allIssues.map(i =>
-    `#${i.number}: ${i.title}\nLabels: ${i.labels.map(l=>l.name).join(', ')||'none'}\n${(i.body||'').substring(0,200)}`
-  ).join('\n\n---\n\n');
-
-  const prompt = `You are a senior security engineer analyzing the open GitHub issues for the FinSecure API (https://github.com/${config.repo}).
-
-Classify each issue. Respond ONLY with raw JSON — no explanation, no markdown.
-
-For each issue number return:
-- type: "bug", "security", or "feature"
-- criticality: "critical", "high", "medium", or "low"
-- summary: one sentence with the core problem and business risk
-
-Severity: critical=auth bypass/injection/breach, high=functional bug or security hardening, medium=degraded experience, low=minor.
-
-Issues:
-${issueList}
-
-Format: {"1": {"type": "security", "criticality": "critical", "summary": "..."}, "2": {...}}`;
-
-  if (backendOk) {
-    try {
-      const res = await fetch(`${config.backend}/sessions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || res.status);
-      const url = data.url || `https://app.devin.ai/sessions/${data.session_id || data.id}`;
-      showToast(`devin scan started → <a href="${url}" target="_blank" style="color:var(--blue)">watch session →</a><br>paste JSON output in configure → classifications`, 'purple');
-    } catch(err) {
-      showToast('error starting scan: ' + err.message, 'error');
-    }
-  } else {
-    window.open(`https://app.devin.ai/?prompt=${encodeURIComponent(prompt)}`, '_blank');
-    showToast('backend not connected — session opened directly in devin.<br>paste JSON output in configure → classifications', 'purple');
-  }
-
-  btn.disabled = false;
-  btn.textContent = '✦ scan with devin';
-}
-
-function applyClassifications() {
-  const raw = document.getElementById('cfg-json').value.trim();
-  if (!raw) { closeConfig(); return; }
-  try {
-    const parsed = JSON.parse(raw);
-    Object.keys(parsed).forEach(k => { aiCls[parseInt(k)] = parsed[k]; });
-    localStorage.setItem('ai_cls', JSON.stringify(aiCls));
-    closeConfig();
-    document.getElementById('issues-list').innerHTML = allIssues.map((i, idx) => renderIssue(i, idx * 40)).join('');
-    updateStats();
-    applyFilter();
-    showToast(`${Object.keys(parsed).length} issues classified by devin ✓`, 'success');
-  } catch(e) {
-    showToast('invalid JSON — check the format', 'error');
-  }
-}
-
-function clearData() {
-  aiCls = {};
-  localStorage.removeItem('ai_cls');
-  localStorage.removeItem('devin_count');
-  devinCount = 0;
-  document.getElementById('s-devin').textContent = 0;
-  allIssues.forEach(i => localStorage.removeItem(`dsess_${i.number}`));
-  loadIssues();
-  showToast('local data cleared', 'info');
-}
-
 function startPolling(issueNum, sessionId) {
   let attempts = 0;
-  const max = 40;
   const interval = setInterval(async () => {
     attempts++;
-    if (attempts > max) { clearInterval(interval); return; }
+    if (attempts > 40) { clearInterval(interval); return; }
     try {
       const res = await fetch(`${config.backend}/sessions/${sessionId}`);
       if (!res.ok) return;
@@ -615,37 +818,123 @@ function startPolling(issueNum, sessionId) {
       const prUrl = data.pr_url;
       const sessionUrl = data.session_url || data.url || `https://app.devin.ai/sessions/${sessionId}`;
       const btn = document.getElementById(`btn-${issueNum}`);
-      if (!btn) { clearInterval(interval); return; }
 
       if (prUrl) {
-        btn.innerHTML = `PR opened → <a href="${prUrl}" target="_blank" style="color:var(--green);text-decoration:none">view PR →</a>`;
-        btn.className = 'btn-fix done';
-        btn.disabled = true;
-        localStorage.setItem(`dsess_${issueNum}`, 'pr_opened');
-        showToast(`devin opened a PR → <a href="${prUrl}" target="_blank" style="color:var(--green)">view PR →</a>`, 'success');
-        clearInterval(interval);
-      } else if (status === 'completed') {
-        btn.innerHTML = `done → <a href="${sessionUrl}" target="_blank" style="color:var(--green);text-decoration:none">view session →</a>`;
-        btn.className = 'btn-fix done';
-        btn.disabled = true;
+        if (btn) { btn.innerHTML = `PR opened → <a href="${prUrl}" target="_blank" style="color:var(--green);text-decoration:none">view →</a>`; btn.className = 'btn-fix done'; btn.disabled = true; }
+        localStorage.setItem(`dsess_${currentRepo}_${issueNum}`, 'pr_opened');
+        showToast(`PR opened by devin → <a href="${prUrl}" target="_blank" style="color:var(--green)">review →</a>`, 'success');
         clearInterval(interval);
       } else if (status === 'blocked') {
-        btn.textContent = 'devin needs input';
-        btn.className = 'btn-fix running';
-        showToast(`devin needs your input → <a href="${sessionUrl}" target="_blank" style="color:var(--amber)">open session →</a>`, 'info');
+        if (btn) { btn.textContent = 'needs input'; btn.className = 'btn-fix running'; }
+        showToast(`devin needs input → <a href="${sessionUrl}" target="_blank" style="color:var(--amber)">open session →</a>`, 'info');
         clearInterval(interval);
-      } else if (['stopped','error','failed'].includes(status)) {
-        btn.textContent = 'fix with devin';
-        btn.className = 'btn-fix';
-        btn.disabled = false;
+      } else if (['completed','stopped','error','failed'].includes(status)) {
+        if (btn) { btn.innerHTML = `done → <a href="${sessionUrl}" target="_blank" style="color:var(--green);text-decoration:none">view →</a>`; btn.className = 'btn-fix done'; btn.disabled = true; }
         clearInterval(interval);
-      } else {
-        btn.textContent = `devin working...`;
-        btn.className = 'btn-fix running';
       }
-    } catch(e) { /* keep trying */ }
+    } catch {}
   }, 15000);
 }
+
+async function loadSessions() {
+  const list = document.getElementById('sessions-list');
+  if (!backendOk) { list.innerHTML = '<div class="loading" style="color:var(--amber)">connect your backend in settings</div>'; return; }
+  list.innerHTML = '<div class="loading"><div class="spinner"></div>loading sessions...</div>';
+  try {
+    const res = await fetch(`${config.backend}/sessions`);
+    const data = await res.json();
+    const sessions = data.sessions || data.items || data || [];
+    document.getElementById('sess-count').textContent = `(${sessions.length})`;
+    if (!sessions.length) { list.innerHTML = '<div class="loading">no sessions yet</div>'; return; }
+    list.innerHTML = sessions.map((s, i) => {
+      const status = s.status || s.state || 'unknown';
+      const title = s.issue_title || s.title || s.prompt?.substring(0,70) || `session ${i+1}`;
+      const sid = s.session_id || s.id || '';
+      const url = s.session_url || s.url || (sid ? `https://app.devin.ai/sessions/${sid}` : '#');
+      const prUrl = s.pr_url;
+      return `<div class="session-card" style="animation-delay:${i*40}ms">
+        <div class="session-dot ${status}"></div>
+        <div class="session-info">
+          <div class="session-title">${title}</div>
+          <div class="session-meta">${status}${s.issue_number ? ` · issue #${s.issue_number}` : ''}</div>
+        </div>
+        ${prUrl ? `<a href="${prUrl}" target="_blank" class="pr-link" style="color:var(--green)">PR →</a>` : ''}
+        <a href="${url}" target="_blank" class="pr-link">session →</a>
+      </div>`;
+    }).join('');
+  } catch(err) {
+    list.innerHTML = `<div class="loading" style="color:var(--red)">${err.message}</div>`;
+  }
+}
+
+async function runDevinScan() {
+  const issueList = allIssues.map(i =>
+    `#${i.number}: ${i.title}\nLabels: ${i.labels.map(l=>l.name).join(', ')||'none'}\n${(i.body||'').substring(0,150)}`
+  ).join('\n\n---\n\n');
+  const prompt = `You are a senior security engineer analyzing open GitHub issues for https://github.com/${currentRepo}.
+
+Classify each issue. Respond ONLY with raw JSON — no markdown, no explanation.
+
+For each issue number:
+- type: "bug", "security", or "feature"
+- criticality: "critical", "high", "medium", or "low"
+- summary: one sentence with core problem and business risk
+
+Critical = auth bypass/injection/breach. High = functional bug or security hardening. Medium = degraded UX. Low = minor.
+
+Issues:
+${issueList}
+
+Format: {"1": {"type": "security", "criticality": "critical", "summary": "..."}}`;
+
+  if (backendOk) {
+    try {
+      const res = await fetch(`${config.backend}/sessions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, issue_title: 'backlog classification scan' })
+      });
+      const data = await res.json();
+      const url = data.session_url || data.url || `https://app.devin.ai/sessions/${data.session_id || data.id}`;
+      showToast(`scan started → <a href="${url}" target="_blank" style="color:var(--purple)">watch devin →</a><br>paste JSON in settings → classifications`, 'purple');
+    } catch(e) { showToast('error: ' + e.message, 'error'); }
+  } else {
+    window.open(`https://app.devin.ai/?prompt=${encodeURIComponent(prompt)}`, '_blank');
+    showToast('paste devin JSON output in settings → classifications', 'purple');
+  }
+}
+
+// ── SETTINGS ──
+function openSettings() {
+  document.getElementById('s-backend').value = config.backend;
+  document.getElementById('s-json').value = '';
+  document.getElementById('settings-modal').classList.add('open');
+}
+async function saveSettings() {
+  config.backend = document.getElementById('s-backend').value.trim().replace(/\/$/, '');
+  localStorage.setItem('backend_url', config.backend);
+  closeModal('settings-modal');
+  showToast('testing connection...', 'info');
+  await checkBackend();
+  showToast(backendOk ? 'backend connected ✓' : 'could not reach backend', backendOk ? 'success' : 'error');
+}
+function applyClassifications() {
+  const raw = document.getElementById('s-json').value.trim();
+  if (!raw) return;
+  try {
+    const parsed = JSON.parse(raw);
+    Object.keys(parsed).forEach(k => { aiCls[parseInt(k)] = parsed[k]; });
+    localStorage.setItem(`ai_cls_${currentRepo}`, JSON.stringify(aiCls));
+    localStorage.setItem('ai_cls', JSON.stringify(aiCls));
+    closeModal('settings-modal');
+    document.getElementById('issues-list').innerHTML = allIssues.map((i,idx) => renderIssue(i, idx*40)).join('');
+    updateMetrics(); applyFilter();
+    showToast(`${Object.keys(parsed).length} issues classified ✓`, 'success');
+  } catch { showToast('invalid JSON', 'error'); }
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
 
 function showToast(msg, type = 'info') {
   const t = document.getElementById('toast');
@@ -653,39 +942,24 @@ function showToast(msg, type = 'info') {
   setTimeout(() => t.classList.remove('show'), 6000);
 }
 
-function openConfig() {
-  document.getElementById('cfg-backend').value = config.backend;
-  document.getElementById('cfg-repo').value = config.repo;
-  document.getElementById('cfg-json').value = '';
-  document.getElementById('config-modal').classList.add('open');
-}
-function closeConfig() { document.getElementById('config-modal').classList.remove('open'); }
-async function saveConfig() {
-  config.backend = document.getElementById('cfg-backend').value.trim().replace(/\/$/, '');
-  config.repo = document.getElementById('cfg-repo').value.trim();
-  localStorage.setItem('backend_url', config.backend);
-  localStorage.setItem('cfg_repo', config.repo);
-  closeConfig();
-  showToast('testing backend connection...', 'info');
-  await checkBackend();
-  if (backendOk) showToast('backend connected ✓', 'success');
-  else showToast('could not reach backend — check the URL', 'error');
-}
-document.getElementById('config-modal').addEventListener('click', e => { if (e.target.id === 'config-modal') closeConfig(); });
-
-checkBackend();
-loadIssues();
-
-// Resume polling for any in-progress sessions on page reload
-Object.keys(localStorage).forEach(key => {
-  if (key.startsWith('dsess_')) {
-    const issueNum = parseInt(key.replace('dsess_', ''));
-    const val = localStorage.getItem(key);
-    if (val && val !== 'done' && val !== 'pr_opened' && val.length > 5) {
-      startPolling(issueNum, val);
+// ── BOOT ──
+if (repos.length > 0) {
+  if (!currentRepo) currentRepo = repos[0].full_name;
+  aiCls = JSON.parse(localStorage.getItem(`ai_cls_${currentRepo}`) || '{}');
+  document.getElementById('onboarding').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  initApp();
+  // Resume polling
+  Object.keys(localStorage).forEach(key => {
+    if (key.startsWith(`dsess_${currentRepo}_`)) {
+      const num = parseInt(key.replace(`dsess_${currentRepo}_`, ''));
+      const val = localStorage.getItem(key);
+      if (val && val !== 'done' && val !== 'pr_opened' && val.length > 5) {
+        startPolling(num, val);
+      }
     }
-  }
-});
+  });
+}
 </script>
 </body>
 </html>

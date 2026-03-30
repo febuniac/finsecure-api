@@ -491,19 +491,20 @@ Stay focused on this issue only.`;
       const res = await fetch(`${config.backend}/sessions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
+        body: JSON.stringify({ prompt, issue_number: num, issue_title: title })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || res.status);
       const sid = data.session_id || data.id;
-      const url = data.url || (sid ? `https://app.devin.ai/sessions/${sid}` : 'https://app.devin.ai');
-      btn.textContent = 'sent ✓';
-      btn.className = 'btn-fix done';
-      localStorage.setItem(`dsess_${num}`, 'done');
+      const url = data.session_url || data.url || (sid ? `https://app.devin.ai/sessions/${sid}` : 'https://app.devin.ai');
+      localStorage.setItem(`dsess_${num}`, sid || 'done');
       devinCount++;
       localStorage.setItem('devin_count', devinCount);
       document.getElementById('s-devin').textContent = devinCount;
-      showToast(`devin session created → <a href="${url}" target="_blank" style="color:var(--blue)">view session →</a>`, 'success');
+      btn.textContent = 'devin working...';
+      btn.className = 'btn-fix running';
+      showToast(`session started → <a href="${url}" target="_blank" style="color:var(--blue)">watch devin →</a>`, 'success');
+      if (sid) startPolling(num, sid);
     } catch(err) {
       btn.textContent = 'fix with devin';
       btn.className = 'btn-fix';
@@ -511,7 +512,6 @@ Stay focused on this issue only.`;
       showToast('error: ' + err.message, 'error');
     }
   } else {
-    // fallback: open app.devin.ai directly
     setTimeout(() => {
       btn.textContent = 'sent ✓';
       btn.className = 'btn-fix done';
@@ -601,6 +601,52 @@ function clearData() {
   showToast('local data cleared', 'info');
 }
 
+function startPolling(issueNum, sessionId) {
+  let attempts = 0;
+  const max = 40;
+  const interval = setInterval(async () => {
+    attempts++;
+    if (attempts > max) { clearInterval(interval); return; }
+    try {
+      const res = await fetch(`${config.backend}/sessions/${sessionId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const status = data.status || data.state || 'running';
+      const prUrl = data.pr_url;
+      const sessionUrl = data.session_url || data.url || `https://app.devin.ai/sessions/${sessionId}`;
+      const btn = document.getElementById(`btn-${issueNum}`);
+      if (!btn) { clearInterval(interval); return; }
+
+      if (prUrl) {
+        btn.innerHTML = `PR opened → <a href="${prUrl}" target="_blank" style="color:var(--green);text-decoration:none">view PR →</a>`;
+        btn.className = 'btn-fix done';
+        btn.disabled = true;
+        localStorage.setItem(`dsess_${issueNum}`, 'pr_opened');
+        showToast(`devin opened a PR → <a href="${prUrl}" target="_blank" style="color:var(--green)">view PR →</a>`, 'success');
+        clearInterval(interval);
+      } else if (status === 'completed') {
+        btn.innerHTML = `done → <a href="${sessionUrl}" target="_blank" style="color:var(--green);text-decoration:none">view session →</a>`;
+        btn.className = 'btn-fix done';
+        btn.disabled = true;
+        clearInterval(interval);
+      } else if (status === 'blocked') {
+        btn.textContent = 'devin needs input';
+        btn.className = 'btn-fix running';
+        showToast(`devin needs your input → <a href="${sessionUrl}" target="_blank" style="color:var(--amber)">open session →</a>`, 'info');
+        clearInterval(interval);
+      } else if (['stopped','error','failed'].includes(status)) {
+        btn.textContent = 'fix with devin';
+        btn.className = 'btn-fix';
+        btn.disabled = false;
+        clearInterval(interval);
+      } else {
+        btn.textContent = `devin working...`;
+        btn.className = 'btn-fix running';
+      }
+    } catch(e) { /* keep trying */ }
+  }, 15000);
+}
+
 function showToast(msg, type = 'info') {
   const t = document.getElementById('toast');
   t.innerHTML = msg; t.className = `toast ${type} show`;
@@ -629,6 +675,17 @@ document.getElementById('config-modal').addEventListener('click', e => { if (e.t
 
 checkBackend();
 loadIssues();
+
+// Resume polling for any in-progress sessions on page reload
+Object.keys(localStorage).forEach(key => {
+  if (key.startsWith('dsess_')) {
+    const issueNum = parseInt(key.replace('dsess_', ''));
+    const val = localStorage.getItem(key);
+    if (val && val !== 'done' && val !== 'pr_opened' && val.length > 5) {
+      startPolling(issueNum, val);
+    }
+  }
+});
 </script>
 </body>
 </html>

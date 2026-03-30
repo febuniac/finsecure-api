@@ -385,36 +385,59 @@ textarea.modal-input { height: 80px; resize: vertical; font-size: 11px; }
   </div>
 </div>
 
-<!-- Settings modal -->
+<!-- Settings / Devin Setup modal -->
 <div class="modal-overlay" id="settings-modal">
-  <div class="modal" style="width:520px">
-    <h3>settings</h3>
-    <div class="modal-sub">Configure your backend and notifications.</div>
+  <div class="modal" style="width:540px;max-height:90vh;overflow-y:auto">
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-      <div class="modal-field" style="margin:0">
-        <div class="modal-label">backend URL</div>
-        <input class="modal-input" id="s-backend" type="text" placeholder="https://your.railway.app">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <h3 style="margin:0">connect devin</h3>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px">Configure your backend and notifications</div>
       </div>
-      <div class="modal-field" style="margin:0">
-        <div class="modal-label">notification email</div>
-        <input class="modal-input" id="s-email" type="email" placeholder="team@company.com">
+      <div id="setup-status-badge" style="font-size:11px;font-family:var(--font-mono);padding:4px 10px;border-radius:20px;border:1px solid var(--border);color:var(--muted)">not connected</div>
+    </div>
+
+    <!-- Step 1: Backend -->
+    <div style="border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:22px;height:22px;border-radius:50%;background:var(--blue-bg);border:1px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--blue);font-family:var(--font-mono);flex-shrink:0">1</div>
+        <div style="font-size:13px;font-weight:500">Backend URL</div>
+        <div id="s-backend-status" style="margin-left:auto;font-size:11px;font-family:var(--font-mono);color:var(--muted)"></div>
+      </div>
+      <input class="modal-input" id="s-backend" type="text" placeholder="https://your-app.up.railway.app" oninput="testBackendLive(this.value)">
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;font-family:var(--font-mono)">
+        Deploy <a href="https://github.com/febuniac/finsecure-api/blob/main/main.py" target="_blank" style="color:var(--blue)">main.py</a> on Railway with these env vars:
+        <span style="color:var(--hint)">DEVIN_API_KEY · DEVIN_ORG_ID · SENDGRID_API_KEY · NOTIFY_EMAIL · FROM_EMAIL</span>
       </div>
     </div>
 
-    <div class="modal-field">
-      <div class="modal-label">paste devin classification JSON (optional)</div>
-      <textarea class="modal-input" id="s-json" style="height:70px" placeholder='{"1": {"type": "security", "criticality": "critical", "summary": "..."}}'></textarea>
+    <!-- Step 2: Notification email -->
+    <div style="border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:22px;height:22px;border-radius:50%;background:var(--purple-bg);border:1px solid var(--purple-border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--purple);font-family:var(--font-mono);flex-shrink:0">2</div>
+        <div style="font-size:13px;font-weight:500">Notification email</div>
+        <div style="font-size:11px;color:var(--hint);margin-left:auto">optional</div>
+      </div>
+      <input class="modal-input" id="s-email" type="email" placeholder="team@yourcompany.com">
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">Alerts when Devin opens a PR, gets blocked, or a new security issue appears</div>
     </div>
 
-    <div style="background:var(--surface2);border-radius:6px;padding:10px 14px;margin-bottom:4px;font-size:11px;color:var(--muted);font-family:var(--font-mono);line-height:1.6">
-      <span style="color:var(--blue)">backend variables needed:</span> DEVIN_API_KEY · DEVIN_ORG_ID · SENDGRID_API_KEY · NOTIFY_EMAIL · FROM_EMAIL
+    <!-- Step 3: AI classifications -->
+    <div style="border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:22px;height:22px;border-radius:50%;background:var(--purple-bg);border:1px solid var(--purple-border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--purple);font-family:var(--font-mono);flex-shrink:0">3</div>
+        <div style="font-size:13px;font-weight:500">AI classifications</div>
+        <div style="font-size:11px;color:var(--hint);margin-left:auto">optional</div>
+      </div>
+      <textarea class="modal-input" id="s-json" style="height:65px" placeholder='Paste JSON from "scan with devin" → {"1": {"type": "security", "criticality": "critical", "summary": "..."}}'></textarea>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">Run "✦ scan with devin" first, then paste the JSON output here to classify all issues automatically</div>
     </div>
 
-    <div class="modal-footer">
+    <div class="modal-footer" style="margin-top:0">
       <button class="btn btn-ghost btn-sm" onclick="closeModal('settings-modal')">cancel</button>
       <button class="btn btn-scan btn-sm" onclick="applyClassifications()">apply classifications</button>
-      <button class="btn btn-primary btn-sm" onclick="saveSettings()">save & test</button>
+      <button class="btn btn-primary btn-sm" onclick="saveSettings()">save & connect</button>
     </div>
   </div>
 </div>
@@ -594,6 +617,17 @@ function initApp() {
   loadCurrentRepo();
 }
 
+async function testBackendLive(url) {
+  const status = document.getElementById('s-backend-status');
+  if (!url || !url.startsWith('http')) { status.textContent = ''; return; }
+  status.textContent = 'testing...'; status.style.color = 'var(--muted)';
+  try {
+    const res = await fetch(`${url.trim().replace(/\/+$/, '')}/health`, { signal: AbortSignal.timeout(5000) });
+    if (res.ok) { status.textContent = '✓ connected'; status.style.color = 'var(--green)'; }
+    else throw new Error();
+  } catch { status.textContent = '✗ unreachable'; status.style.color = 'var(--red)'; }
+}
+
 async function checkBackend() {
   if (!config.backend) return;
   try {
@@ -604,6 +638,8 @@ async function checkBackend() {
       pill.className = 'backend-pill connected';
       document.getElementById('pill-dot').classList.remove('pulse');
       document.getElementById('pill-text').textContent = 'backend connected';
+      const badge = document.getElementById('setup-status-badge');
+      if (badge) { badge.textContent = '✓ connected'; badge.style.borderColor = 'var(--green-border)'; badge.style.color = 'var(--green)'; badge.style.background = 'var(--green-bg)'; }
     } else throw new Error();
   } catch {
     backendOk = false;
@@ -809,6 +845,12 @@ Stay focused on this issue only.`;
 
   if (btn) { btn.textContent = 'sending...'; btn.className = 'btn-fix running'; btn.disabled = true; }
 
+  if (!backendOk && !config.backend) {
+    showToast('backend not configured — click to set up', 'error');
+    openSettings();
+    if (btn) { btn.textContent = 'fix with devin'; btn.className = 'btn-fix'; btn.disabled = false; }
+    return;
+  }
   if (backendOk) {
     try {
       const res = await fetch(`${config.backend}/sessions`, {
@@ -948,6 +990,12 @@ function openSettings() {
   document.getElementById('s-email').value = config.notifyEmail || '';
   document.getElementById('s-json').value = '';
   document.getElementById('settings-modal').classList.add('open');
+  const badge = document.getElementById('setup-status-badge');
+  if (badge) {
+    if (backendOk) { badge.textContent = '✓ connected'; badge.style.borderColor = 'var(--green-border)'; badge.style.color = 'var(--green)'; badge.style.background = 'var(--green-bg)'; }
+    else { badge.textContent = 'not connected'; badge.style.borderColor = 'var(--border)'; badge.style.color = 'var(--muted)'; badge.style.background = 'transparent'; }
+  }
+  if (config.backend) testBackendLive(config.backend);
 }
 async function saveSettings() {
   config.backend = document.getElementById('s-backend').value.trim().replace(/\/$/, '');

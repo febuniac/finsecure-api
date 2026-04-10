@@ -24,8 +24,7 @@ def calculate_risk_score(amount: float, country: str, is_new_user: bool) -> floa
     if is_new_user:
         score += 0.2
 
-    # BUG: score can exceed 1.0, breaking downstream percentage displays
-    return score
+    return min(score, 1.0)
 
 
 # Security vulnerability: user-controlled input passed to shell command
